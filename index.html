@@ -84,6 +84,10 @@ a{color:var(--shroud)}
 .pin.found{opacity:.35}
 .pin.found::after{content:"";position:absolute;right:-1px;top:-1px;width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--bg)}
 .pin.hidefound{display:none}
+.tip{position:absolute;left:0;top:0;z-index:7;pointer-events:none;background:rgba(15,17,22,.94);border:1px solid var(--line2);border-radius:6px;padding:6px 10px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.45);max-width:min(320px,calc(100% - 24px));overflow:hidden;text-overflow:ellipsis}
+.tip b{display:block;font-size:13px;font-weight:600}
+.tip small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.tip small i{font-style:normal;color:var(--ok)}
 
 .ctrl{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;z-index:5}
 .ctrl button{width:38px;height:38px;border-radius:7px;background:var(--panel);border:1px solid var(--line2);cursor:pointer;display:grid;place-items:center;font-size:18px;line-height:1}
@@ -160,7 +164,7 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
   <aside class="side" id="side" aria-label="메뉴">
     <div class="side-in">
       <div class="brand">
-        <h1>인슈라우디드</h1>
+        <h1>인슈라오디드</h1>
         <p>엠버베일 한글 지도</p>
       </div>
       <nav class="tabs">
@@ -204,6 +208,7 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
         <ul id="trackList"></ul>
       </section>
       <div class="coords" id="coords">X — · Y —</div>
+      <div class="tip" id="tip" hidden></div>
       <div class="pop" id="pop" hidden></div>
     </div>
     <div class="list" id="list" hidden><div class="list-in" id="listIn"></div></div>
@@ -342,12 +347,12 @@ function apply(){
     for (const { m, e } of pinEls){ const [wx, wy] = toW(m), h = e.classList.contains('sm') ? 10 : 14; e.style.transform = `translate(${wx*view.s - h}px,${wy*view.s - h}px)`; }
     for (const { r, e } of labelEls){ e.style.transform = `translate(${(r.c[0]-X0)*view.s}px,${(Y1-r.c[1])*view.s}px) translate(-50%,-50%)`; }
   }
-  placePop();
+  placePop(); placeTip();
 }
 
 /* ───────── 핀 ───────── */
 function renderPins(){
-  pinsEl.textContent = ''; pinEls = [];
+  pinsEl.textContent = ''; pinEls = []; hideTip();
   const hideFound = $('hideFound').checked;
   const frag = document.createDocumentFragment();
   for (const m of MARKERS){
@@ -356,7 +361,9 @@ function renderPins(){
     const b = el('button', { className:'pin' + (g.small ? ' sm' : '') + (f ? ' found' : '') + (f && hideFound ? ' hidefound' : '') + (popM === m ? ' active' : '') });
     b.innerHTML = icon(m.g, g.small ? 20 : 28);
     b.setAttribute('aria-label', `${m.name.ko} (${g.ko})`);
-    b.addEventListener('click', ev => { ev.stopPropagation(); openMarker(m); });
+    b.addEventListener('click', ev => { ev.stopPropagation(); hideTip(); openMarker(m); });
+    b.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse' && !pts.size && popM !== m) showTip(m); });
+    b.addEventListener('pointerleave', hideTip);
     frag.append(b); pinEls.push({ m, e:b });
   }
   pinsEl.append(frag); laidOutS = -1; apply();
@@ -368,6 +375,24 @@ function renderLabels(){
     const e = el('div', { className:'label' }); e.append(el('b', {}, r.ko), el('small', {}, r.en));
     labelsEl.append(e); labelEls.push({ r, e });
   }
+}
+
+/* ───────── 호버 툴팁 ───────── */
+const tip = $('tip'); let tipM = null;
+function showTip(m){
+  tipM = m; tip.textContent = '';
+  const sub = el('small', {}, GI[m.g].ko + (REG[m.region] ? ' · ' + REG[m.region].ko : ''));
+  if (found.has(m.id)){ sub.append(' · '); sub.append(el('i', {}, '찾음')); }
+  tip.append(el('b', {}, m.name.ko), sub);
+  tip.hidden = false; placeTip();
+}
+function hideTip(){ tip.hidden = true; tipM = null; }
+function placeTip(){
+  if (tip.hidden || !tipM) return;
+  const [wx, wy] = toW(tipM), sx = view.tx + wx*view.s, sy = view.ty + wy*view.s;
+  const W = mapEl.clientWidth, tw = tip.offsetWidth, th = tip.offsetHeight;
+  const left = clamp(sx - tw/2, 12, W - tw - 12), top = sy - th - 18 < 12 ? sy + 18 : sy - th - 18;
+  tip.style.transform = `translate(${left}px,${top}px)`;
 }
 
 /* ───────── 팝업 ───────── */
@@ -521,7 +546,7 @@ mapEl.addEventListener('pointerdown', e => {
   mapEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
   if (pts.size === 1) moved = 0;
   if (pts.size === 2){ const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x-b.x, a.y-b.y); }
-  mapEl.classList.add('dragging');
+  mapEl.classList.add('dragging'); hideTip();
 });
 mapEl.addEventListener('pointermove', e => {
   const r = mapEl.getBoundingClientRect(), wx = (e.clientX - r.left - view.tx)/view.s + X0, wy = Y1 - (e.clientY - r.top - view.ty)/view.s;

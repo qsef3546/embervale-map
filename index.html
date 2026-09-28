@@ -3,551 +3,550 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}</style>
 <title>엠버베일 한글 지도</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
 <style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 :root{
   color-scheme:dark;
   --bg:#111318; --panel:#181b22; --panel2:#20242d; --line:#2b303b; --line2:#3a4050;
   --ink:#e0e2e7; --muted:#8d93a3; --dim:#5f6575;
-  --ember:#e58a3c; --shroud:#9d84d6; --ocean:#141d26;
+  --ember:#e58a3c; --shroud:#9d84d6; --ok:#5fbf7a; --ocean:#161d25;
   --display:'Nanum Myeongjo','Batang',serif;
   --body:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
 }
-html,body{height:100%}
+html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--ember);outline-offset:2px}
+a{color:var(--shroud)}
 
-.app{display:grid;grid-template-columns:304px 1fr;height:100%}
+.app{display:grid;grid-template-columns:320px 1fr;height:100%}
 
-/* ── 사이드바 ── */
-.side{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:20px 16px 24px;display:flex;flex-direction:column;gap:18px}
-.brand h1{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.04em;margin:0;line-height:1.15;text-wrap:balance}
-.brand h1 span{color:var(--ember)}
-.brand p{margin:6px 0 0;color:var(--muted);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
-.sec-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline}
-.sec-title b{font-weight:500;color:var(--dim);letter-spacing:.04em;text-transform:none}
+/* 사이드바 */
+.side{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
+.side-in{padding:18px 16px 22px;display:flex;flex-direction:column;gap:16px}
+.brand{text-align:center;padding-top:4px}
+.brand h1{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.06em;margin:0;line-height:1.1}
+.brand p{margin:6px 0 0;color:var(--ember);font-size:11px;letter-spacing:.24em;text-transform:uppercase}
+.tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line2);border-radius:7px;overflow:hidden}
+.tabs a{text-align:center;padding:8px 0;text-decoration:none;color:var(--muted);font-size:13px}
+.tabs a[aria-current="page"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--ember)}
+.sec-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
+.sec-title button{background:none;border:0;color:var(--dim);font-size:11px;letter-spacing:.04em;cursor:pointer;padding:2px 4px;text-transform:none}
+.sec-title button:hover{color:var(--ink)}
 
 .search{display:flex;border:1px solid var(--line2);border-radius:6px;background:var(--bg)}
 .search input{flex:1;min-width:0;background:none;border:0;padding:9px 10px;outline:none}
 .search:focus-within{border-color:var(--ember)}
-.results{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
-.results button{width:100%;text-align:left;background:none;border:0;padding:7px 8px;border-radius:5px;display:flex;gap:8px;align-items:center;cursor:pointer}
+.results{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:1px;max-height:280px;overflow-y:auto}
+.results button{width:100%;text-align:left;background:none;border:0;padding:6px 6px;border-radius:5px;display:flex;gap:8px;align-items:center;cursor:pointer}
 .results button:hover{background:var(--panel2)}
-.results small{color:var(--muted);margin-left:auto;font-size:11px}
+.results .t{display:flex;flex-direction:column;min-width:0}
+.results .t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.results small{color:var(--dim);font-size:11px}
 .empty{color:var(--dim);font-size:12px;padding:6px 8px}
 
 .row{display:flex;gap:8px}
 .btn{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:7px 10px;cursor:pointer;font-size:12.5px;flex:1}
 .btn:hover{border-color:var(--muted)}
-.btn.primary{background:var(--ember);border-color:var(--ember);color:#1b1208;font-weight:600}
-.btn.primary:hover{filter:brightness(1.08)}
 
-.progress{display:grid;gap:6px}
-.bar{height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--ember);width:0;transition:width .3s}
-.progress .nums{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-
-.cats{display:grid;grid-template-columns:1fr 1fr;gap:2px 6px}
-.cat{display:flex;align-items:center;gap:7px;background:none;border:0;padding:6px 4px;border-radius:5px;cursor:pointer;text-align:left;min-width:0}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:1px 6px}
+.cat{display:flex;align-items:center;gap:7px;background:none;border:0;padding:5px 4px;border-radius:5px;cursor:pointer;text-align:left;min-width:0}
 .cat:hover{background:var(--panel2)}
 .cat .nm{flex:1;min-width:0;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cat .ct{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.cat[aria-pressed="false"] .nm,.cat[aria-pressed="false"] .ct{color:var(--dim);text-decoration:line-through}
-.cat[aria-pressed="false"] svg{opacity:.35}
-.cat.zero .ct{color:var(--dim)}
+.cat[aria-pressed="false"] .nm,.cat[aria-pressed="false"] .ct{color:var(--dim)}
+.cat[aria-pressed="false"] svg{opacity:.3}
 
-.regions{display:flex;flex-direction:column;gap:2px}
-.regions button{display:flex;align-items:center;gap:10px;background:none;border:0;border-radius:5px;padding:7px 6px;cursor:pointer;text-align:left}
-.regions button:hover{background:var(--panel2)}
-.regions .sw{width:12px;height:12px;border-radius:3px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
-.regions .en{margin-left:auto;font-size:11px;color:var(--dim)}
-
-.check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);cursor:pointer}
+.check{display:flex;align-items:center;gap:8px;font-size:12.5px;cursor:pointer}
 .check input{accent-color:var(--ember)}
+.note{font-size:11.5px;line-height:1.65;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 
-.note{font-size:11.5px;line-height:1.6;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:auto}
-.note a{color:var(--shroud)}
-
-/* ── 지도 ── */
-.map{position:relative;overflow:hidden;background:var(--ocean);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+/* 지도 */
+.main{position:relative;overflow:hidden;min-width:0}
+.map{position:absolute;inset:0;background:var(--ocean);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .map.dragging{cursor:grabbing}
-.map.adding{cursor:crosshair}
-.world{position:absolute;left:0;top:0;width:1000px;height:1000px;transform-origin:0 0}
-.world canvas{width:1000px;height:1000px;display:block}
-.layer{position:absolute;inset:0;pointer-events:none}
-.label{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;color:#f4efe3;text-shadow:0 1px 2px #000,0 0 10px rgba(0,0,0,.7)}
-.label b{display:block;font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:.12em}
-.label small{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-top:1px}
-.pin{position:absolute;left:0;top:0;width:30px;height:30px;padding:0;border:0;background:none;pointer-events:auto;cursor:pointer;border-radius:50%}
-.pin svg{display:block;width:30px;height:30px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));transition:transform .12s}
-.pin:hover svg,.pin.active svg{transform:scale(1.18)}
-.pin.found{opacity:.42}
-.pin.found::after{content:"";position:absolute;right:-1px;top:-1px;width:11px;height:11px;border-radius:50%;background:#5fbf7a;box-shadow:0 0 0 2px var(--bg)}
+.world{position:absolute;left:0;top:0;transform-origin:0 0}
+.world canvas{display:block;width:100%;height:100%}
+.layer{position:absolute;left:0;top:0;width:0;height:0}
+.label{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;color:#f4efe3;text-shadow:0 1px 2px #000,0 0 10px rgba(0,0,0,.8);pointer-events:none}
+.label b{display:block;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.14em}
+.label small{display:block;font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.7;margin-top:1px}
+.pin{position:absolute;left:0;top:0;width:28px;height:28px;padding:0;border:0;background:none;cursor:pointer;border-radius:50%}
+.pin svg{display:block;width:28px;height:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.65));transition:transform .12s;transform:scale(var(--ps,1))}
+.pin.sm,.pin.sm svg{width:20px;height:20px}
+.pin:hover svg,.pin.active svg{transform:scale(calc(var(--ps,1) * 1.3))}
+.pin:hover,.pin.active{z-index:2}
+.pin.found{opacity:.35}
+.pin.found::after{content:"";position:absolute;right:-1px;top:-1px;width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 2px var(--bg)}
+.pin.hidefound{display:none}
 
 .ctrl{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;z-index:5}
 .ctrl button{width:38px;height:38px;border-radius:7px;background:var(--panel);border:1px solid var(--line2);cursor:pointer;display:grid;place-items:center;font-size:18px;line-height:1}
 .ctrl button:hover{border-color:var(--muted)}
-.ctrl button[aria-pressed="true"]{background:var(--ember);border-color:var(--ember);color:#1b1208}
 .ctrl svg{width:18px;height:18px}
-
 .side-toggle{display:none;position:absolute;left:14px;top:14px;z-index:5;background:var(--panel);border:1px solid var(--line2);border-radius:7px;padding:9px 12px;cursor:pointer;font-size:13px}
-
-.hint{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--panel);border:1px solid var(--ember);color:var(--ink);padding:9px 14px;border-radius:20px;font-size:12.5px;z-index:6;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+.coords{position:absolute;left:14px;bottom:calc(12px + env(safe-area-inset-bottom,0px));font-size:11px;color:var(--muted);background:rgba(17,19,24,.75);padding:4px 8px;border-radius:5px;font-variant-numeric:tabular-nums;pointer-events:none}
 .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px;letter-spacing:.1em;pointer-events:none}
 
-.pop{position:absolute;left:0;top:0;width:260px;max-width:calc(100vw - 32px);background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:13px 14px 14px;z-index:8;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:default;display:flex;flex-direction:column;gap:9px}
-.pop .hd{display:flex;gap:9px;align-items:flex-start}
-.pop .hd svg{width:26px;height:26px;flex:none}
-.pop h3{margin:0;font-family:var(--display);font-size:17px;font-weight:800;line-height:1.25;text-wrap:balance}
-.pop .meta{font-size:11.5px;color:var(--muted);margin-top:2px}
-.pop p{margin:0;font-size:13px;line-height:1.6;color:#c9ccd4}
-.pop .tag{align-self:flex-start;font-size:10.5px;letter-spacing:.06em;color:var(--shroud);border:1px solid rgba(157,132,214,.45);padding:2px 7px;border-radius:10px}
-.pop .x{position:absolute;right:6px;top:6px;background:none;border:0;color:var(--muted);cursor:pointer;font-size:16px;width:26px;height:26px;border-radius:5px}
-.pop .x:hover{background:var(--panel)}
-.pop label.f{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--muted)}
-.pop input[type=text],.pop select,.pop textarea{background:var(--bg);border:1px solid var(--line2);border-radius:5px;padding:7px 8px;color:var(--ink);font-size:13px;resize:vertical}
-.pop .danger{background:none;border:1px solid #7a3b3b;color:#e59090}
-.pop .danger.arm{background:#7a3b3b;color:#fff}
+/* 진행 패널 (우측) */
+.tracker{position:absolute;right:62px;top:14px;width:250px;max-height:calc(100% - 28px);overflow-y:auto;background:rgba(24,27,34,.96);border:1px solid var(--line2);border-radius:8px;z-index:5}
+.tracker h2{margin:0;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ember);padding:12px 14px 8px;display:flex;justify-content:space-between;align-items:center}
+.tracker h2 button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px}
+.tracker ul{list-style:none;margin:0;padding:0 14px 12px;display:flex;flex-direction:column;gap:9px}
+.tracker li{display:grid;grid-template-columns:20px 1fr auto;gap:4px 8px;align-items:center;font-size:12.5px}
+.tracker li .bar{grid-column:2/4}
+.tracker .num{font-variant-numeric:tabular-nums;color:var(--muted);font-size:11.5px}
+.bar{height:5px;border-radius:3px;background:var(--panel2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ember);width:0;transition:width .3s}
+.bar.done i{background:var(--ok)}
 
+/* 팝업 */
+.pop{position:absolute;left:0;top:0;width:280px;max-width:calc(100% - 24px);background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:13px 14px 14px;z-index:8;box-shadow:0 10px 30px rgba(0,0,0,.55);cursor:default;display:flex;flex-direction:column;gap:9px}
+.pop .hd{display:flex;gap:10px;align-items:flex-start;padding-right:22px}
+.pop .hd svg{width:28px;height:28px;flex:none}
+.pop h3{margin:0;font-family:var(--display);font-size:17px;font-weight:800;line-height:1.3;text-wrap:balance}
+.pop .en{font-size:11.5px;color:var(--dim);margin-top:1px}
+.pop .meta{font-size:11.5px;color:var(--muted);margin-top:3px}
+.pop p{margin:0;font-size:13px;line-height:1.6;color:#c9ccd4}
+.pop .x{position:absolute;right:6px;top:6px;background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;width:26px;height:26px;border-radius:5px}
+.pop .x:hover{background:var(--panel)}
+.pop .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px}
+
+/* 체크리스트 */
+.list{position:absolute;inset:0;overflow-y:auto;padding:24px 24px 40px;background:var(--bg)}
+.list-in{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.list h2{font-family:var(--display);font-size:24px;margin:0 0 2px}
+.list .lead{color:var(--muted);margin:0 0 8px;font-size:13px}
+.overall{display:grid;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.overall .t{display:flex;justify-content:space-between;font-size:13px}
+.overall .t b{font-variant-numeric:tabular-nums}
+details.grp{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+details.grp summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:24px 1fr 90px 64px;gap:10px;align-items:center;padding:11px 14px}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary .nm{font-weight:600}
+details.grp summary .nm small{font-weight:400;color:var(--dim);margin-left:6px;font-size:11.5px}
+details.grp summary .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px 12px}
+.item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:5px;font-size:13px;min-width:0}
+.item:hover{background:var(--panel2)}
+.item input{accent-color:var(--ok);flex:none}
+.item span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.done span{color:var(--dim);text-decoration:line-through}
+.item .go{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;flex:none}
+.item .go:hover{color:var(--ink);background:var(--panel)}
+.list .sec{font-size:11px;letter-spacing:.16em;color:var(--ember);text-transform:uppercase;margin:10px 0 -4px}
+
+@media (max-width:980px){ .tracker{display:none} }
 @media (max-width:760px){
   .app{grid-template-columns:1fr}
-  .side{position:fixed;left:0;top:0;bottom:0;width:min(320px,86vw);z-index:20;transform:translateX(-102%);transition:transform .22s ease;box-shadow:8px 0 30px rgba(0,0,0,.5);padding-top:calc(20px + env(safe-area-inset-top,0px))}
+  .side{position:fixed;left:0;top:0;bottom:0;width:min(330px,88vw);z-index:20;transform:translateX(-102%);transition:transform .22s ease;box-shadow:8px 0 30px rgba(0,0,0,.5);padding-top:env(safe-area-inset-top,0px)}
   .side.open{transform:none}
   .side-toggle{display:block}
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15}
+  .list{padding:64px 16px 32px}
+  details.grp summary{grid-template-columns:22px 1fr 56px}
+  details.grp summary .bar{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="side" id="side" aria-label="지도 메뉴">
-    <div class="brand">
-      <h1>엠버베일 <span>지도</span></h1>
-      <p>Enshrouded · 한글 인터랙티브 맵</p>
-    </div>
-
-    <div>
-      <div class="search"><input id="q" type="search" placeholder="장소 이름 검색…" aria-label="장소 검색" autocomplete="off"></div>
-      <ul class="results" id="results" hidden></ul>
-    </div>
-
-    <div class="progress">
-      <div class="sec-title">탐험 진행도 <b id="progTxt"></b></div>
-      <div class="bar"><i id="progBar"></i></div>
-    </div>
-
-    <div>
-      <div class="sec-title">장소 <b>눌러서 표시/숨김</b></div>
-      <div class="row" style="margin-bottom:8px">
+  <aside class="side" id="side" aria-label="메뉴">
+    <div class="side-in">
+      <div class="brand">
+        <h1>인슈라우디드</h1>
+        <p>엠버베일 한글 지도</p>
+      </div>
+      <nav class="tabs">
+        <a href="#map" id="tabMap">지도</a>
+        <a href="#checklist" id="tabList">100% 체크리스트</a>
+      </nav>
+      <div>
+        <div class="search"><input id="q" type="search" placeholder="장소·수집품 검색 (한글/영문)" aria-label="검색" autocomplete="off"></div>
+        <ul class="results" id="results" hidden></ul>
+      </div>
+      <div class="row">
         <button class="btn" id="showAll">모두 표시</button>
         <button class="btn" id="hideAll">모두 숨김</button>
       </div>
-      <div class="cats" id="cats"></div>
-    </div>
-
-    <button class="btn primary" id="addSide">＋ 내 마커 추가</button>
-
-    <div>
-      <div class="sec-title">지역</div>
-      <div class="regions" id="regions"></div>
-    </div>
-
-    <label class="check"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
-
-    <div class="note">
-      비공식 팬 제작 개략도입니다. 지형은 새로 그렸고 지역 배치와 기본 마커 위치는 대략적입니다.
-      찾은 장소와 직접 추가한 마커는 이 브라우저에만 저장됩니다.
-      정확한 좌표는 <a href="https://enshrouded.wiki.gg/wiki/Map" target="_blank" rel="noopener">공식 위키 지도</a>를 참고하세요.
+      <div id="sections"></div>
+      <label class="check"><input type="checkbox" id="hideFound"> 찾은 항목 지도에서 숨기기</label>
+      <label class="check"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
+      <div class="note">
+        비공식 팬 제작 지도이며 Keen Games와 관련이 없습니다.
+        마커 좌표·이름·설명은 <a href="https://enshrouded.wiki.gg/wiki/Map" target="_blank" rel="noopener">The Official Enshrouded Wiki</a> 기여자들의 데이터를 한국어로 옮긴 것으로,
+        <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.ko" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a>을 따릅니다.
+        배경 지형은 마커 분포로 추정해 새로 그린 개략도입니다. 찾음 표시는 이 브라우저에만 저장됩니다.
+      </div>
     </div>
   </aside>
 
-  <main class="map" id="map" aria-label="엠버베일 지도">
-    <div class="world" id="world"><canvas id="terrain" width="560" height="560"></canvas></div>
-    <div class="layer" id="labels"></div>
-    <div class="layer" id="pins"></div>
-    <div class="loading" id="loading">지형을 그리는 중…</div>
-
-    <button class="side-toggle" id="sideToggle" aria-controls="side" aria-expanded="false">☰ 목록</button>
-
-    <div class="ctrl">
-      <button id="zin" aria-label="확대">＋</button>
-      <button id="zout" aria-label="축소">－</button>
-      <button id="zfit" aria-label="전체 보기"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
-      <button id="addBtn" aria-label="내 마커 추가" aria-pressed="false"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a5 5 0 0 0-5 5c0 3.6 5 9 5 9s5-5.4 5-9a5 5 0 0 0-5-5Zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/></svg></button>
+  <main class="main">
+    <div class="map" id="map" aria-label="엠버베일 지도">
+      <div class="world" id="world"><canvas id="terrain"></canvas></div>
+      <div class="layer" id="pins"></div>
+      <div class="layer" id="labels"></div>
+      <div class="loading" id="loading">지형을 그리는 중…</div>
+      <div class="ctrl">
+        <button id="zin" aria-label="확대">＋</button>
+        <button id="zout" aria-label="축소">－</button>
+        <button id="zfit" aria-label="전체 보기"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
+        <button id="trackBtn" aria-label="진행 상황" aria-pressed="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2Zm0 4h8v2H2Zm0 4h10v2H2Z"/></svg></button>
+      </div>
+      <section class="tracker" id="tracker" aria-label="진행 상황">
+        <h2>진행 상황 <button id="trackClose" aria-label="닫기">✕</button></h2>
+        <ul id="trackList"></ul>
+      </section>
+      <div class="coords" id="coords">X — · Y —</div>
+      <div class="pop" id="pop" hidden></div>
     </div>
-    <div class="hint" id="hint" hidden>지도를 눌러 마커를 놓으세요 · Esc로 취소</div>
-    <div class="pop" id="pop" hidden></div>
+    <div class="list" id="list" hidden><div class="list-in" id="listIn"></div></div>
+    <button class="side-toggle" id="sideToggle" aria-controls="side" aria-expanded="false">☰ 메뉴</button>
   </main>
 </div>
 
+<script src="data.js"></script>
 <script>
 (() => {
-/* ───────── 데이터 ───────── */
-const REGIONS = [
-  { id:'spring', name:'봄의 땅',      en:'Springlands',      x:300, y:690, rgb:[112,146,78]  },
-  { id:'revel',  name:'레블우드',     en:'Revelwood',        x:285, y:350, rgb:[60,104,68]   },
-  { id:'nomad',  name:'유목민 고원',  en:'Nomad Highlands',  x:545, y:470, rgb:[146,146,96]  },
-  { id:'kindle', name:'킨들웨이스트', en:'Kindlewastes',     x:755, y:675, rgb:[198,156,92]  },
-  { id:'alba',   name:'알바네브 산맥', en:'Albaneve Summits', x:720, y:265, rgb:[206,213,222] },
-  { id:'veil',   name:'베일워터 분지', en:'Veilwater Basin',  x:505, y:805, rgb:[78,134,128]  },
-];
-const G = { // 16×16 글리프
-  spire:'M8 1 11 15H5Z', hall:'M3 15V7a5 5 0 0 1 10 0v8h-3V8a2 2 0 0 0-4 0v7Z',
-  start:'M8 1c2 4 5 5 4 10a4 4 0 0 1-8 0c0-3 2-4 2-6 1 2 2 2 2-4Z', town:'M2 8 8 2l6 6v6h-4v-4H6v4H2Z',
-  shrine:'M8 1.5 12.5 8 8 14.5 3.5 8Z', well:'M8 1c3 5 5 7 5 9.5a5 5 0 0 1-10 0C3 8 5 6 8 1Z',
-  root:'m8 1 1.6 5H15l-4.4 3 1.7 5.5L8 11l-4.3 3.5L5.4 9 1 6h5.4Z', dungeon:'M2 15V3h12v12h-4V9H6v6Z',
-  cave:'M1 15C2 7 5 3 8 3s6 4 7 12h-4c0-4-1-6-3-6s-3 2-3 6Z', tomb:'M6.5 1h3v4H13v3H9.5v7h-3V8H3V5h3.5Z',
-  boss:'M1 13 2 4l3.5 4L8 2l2.5 6L14 4l1 9Z', chest:'M2 6h12v8H2Zm0-3h12v2H2Z', note:'M8 3a5 5 0 1 1 0 10A5 5 0 0 1 8 3Z',
+const D = window.EMB;
+/* ───────── 아이콘 ───────── */
+const GL = {
+  spire:'M8 1 11 15H5Z', flame:'M8 1c2 4 5 5 4 10a4 4 0 0 1-8 0c0-3 2-4 2-6 1 2 2 2 2-4Z',
+  sun:'M8 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8ZM7 0h2v3H7Zm0 13h2v3H7ZM0 7h3v2H0Zm13 0h3v2h-3Z', moon:'M10 1a7 7 0 1 0 5 11A6 6 0 0 1 10 1Z',
+  vault:'M2 15V6l6-4 6 4v9Zm4-2h4V8H6Z', obelisk:'M6 15 7 3l1-2 1 2 1 12Z', drop:'M8 1c3 5 5 7 5 9.5a5 5 0 0 1-10 0C3 8 5 6 8 1Z',
+  star:'m8 1 1.6 5H15l-4.4 3 1.7 5.5L8 11l-4.3 3.5L5.4 9 1 6h5.4Z', bale:'M3 9h10l-2 6H5ZM8 1c1.5 2.5 3 3.5 2.5 6h-5C5 4.5 6.5 3.5 8 1Z',
+  hall:'M3 15V7a5 5 0 0 1 10 0v8h-3V8a2 2 0 0 0-4 0v7Z', gem:'M4 2h8l3 4-7 9-7-9Z', house:'M2 8 8 2l6 6v6h-4v-4H6v4H2Z',
+  tent:'M8 2 15 14H1Zm0 6-3 6h6Z', wheat:'M7.2 15V6h1.6v9ZM8 1c2 1 2 3 0 5-2-2-2-4 0-5ZM4 4c2 0 3.5 1.5 3.5 3.5C5.5 7.5 4 6 4 4Zm8 0c0 2-1.5 3.5-3.5 3.5C8.5 5.5 10 4 12 4Z',
+  pick:'M2 4c3-3 9-3 12 0-2-1-4-1.5-5.2-1.3L9 15H7L7.2 2.7C6 2.5 4 3 2 4Z', swords:'M2 2h3l8 8 1.5-1.5 1 1-2 2 1.5 1.5-1 1-1.5-1.5-2 2-1-1L11 12 3 4Z',
+  door:'M2 15V3h12v12h-4V9H6v6Z', cross:'M6.5 1h3v4H13v3H9.5v7h-3V8H3V5h3.5Z',
+  skull:'M8 1a6 6 0 0 0-6 6c0 2 1 3.5 2.5 4.3V15h7v-3.7C13 10.5 14 9 14 7a6 6 0 0 0-6-6Zm-2.5 5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm5 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z',
+  cave:'M1 15C2 7 5 3 8 3s6 4 7 12h-4c0-4-1-6-3-6s-3 2-3 6Z', book:'M2 3c2-1 4-1 5.3.5V14C6 13 4 13 2 14Zm12 0c-2-1-4-1-5.3.5V14c1.3-1 3.3-1 5.3 0Z',
+  shell:'M8 2a6 6 0 1 1-6 6h3a3 3 0 1 0 3-3Z', note:'M6 2h8v9.5a2.5 2.5 0 1 1-2-2.45V5H8v7.5A2.5 2.5 0 1 1 6 10.05Z',
+  statue:'M8 1a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM5 7h6l1 5H4ZM3 13h10v2H3Z', banner:'M3 1h10v14l-5-3-5 3Z',
+  bone:'M3 3a2 2 0 0 1 3 1l5 5a2 2 0 1 1 1 3 2 2 0 1 1-3 1L4 8a2 2 0 1 1-1-3 2 2 0 0 1 0-2Z',
+  mappiece:'M1 3l4.5-1.5 5 2L15 2v11l-4.5 1.5-5-2L1 14Z', relief:'M2 2h12v12H2Zm3 3v6h6V5Z', quest:'M7 2h2v8H7Zm0 10h2v2H7Z',
 };
-const CATS = [
-  { id:'spire',  name:'고대 첨탑',     c:'#7cc4e4', d:'올라가서 정화하면 빠른 이동 지점이 열립니다. 꼭대기에서 글라이더로 내려갈 수 있어요.' },
-  { id:'hall',   name:'할로우 홀',     c:'#c58be0', d:'여러 층으로 된 대형 던전입니다. 파티 플레이를 권장합니다.' },
-  { id:'start',  name:'시작 지점',     c:'#f0a04b' },
-  { id:'town',   name:'마을·거점',     c:'#e8d27a' },
-  { id:'shrine', name:'화염 성소',     c:'#ef7a45' },
-  { id:'well',   name:'엘릭서 우물',   c:'#6fd0b8' },
-  { id:'root',   name:'슈라우드 뿌리', c:'#a98ce8' },
-  { id:'dungeon',name:'던전',          c:'#d06a6a' },
-  { id:'cave',   name:'동굴',          c:'#a9a592' },
-  { id:'tomb',   name:'숨겨진 무덤',   c:'#bba77c' },
-  { id:'boss',   name:'보스',          c:'#e25555' },
-  { id:'chest',  name:'상자·보물',     c:'#d9b35a' },
-  { id:'note',   name:'메모',          c:'#cfd3dc' },
-];
-const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
-const RG = Object.fromEntries(REGIONS.map(r => [r.id, r]));
+const GROUPS = D.groups, GI = Object.fromEntries(GROUPS.map(g => [g.id, g]));
+function icon(gid, size = 28){
+  const g = GI[gid];
+  return `<svg viewBox="0 0 30 30" width="${size}" height="${size}" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#15181f" stroke="${g.color}" stroke-width="2"/><g transform="translate(7 7)"><path d="${GL[g.glyph]}" fill="${g.color}" fill-rule="evenodd"/></g></svg>`;
+}
 
-const BUILTIN = [
-  { id:'b-start', cat:'start', region:'spring', x:240, y:765, name:'잿불 금고 (Cinder Vault)', desc:'게임을 시작하는 지하 금고입니다. 밖으로 나오면 봄의 땅이 펼쳐집니다.' },
-  { id:'b-town',  cat:'town',  region:'revel',  x:318, y:318, name:'브레일린 (Braelyn)', desc:'레블우드의 옛 도시입니다. 메인 퀘스트 진행 중에 들르게 됩니다.' },
-  { id:'s-spring',cat:'spire', region:'spring', x:335, y:690, name:'봄의 땅 고대 첨탑' },
-  { id:'s-revel', cat:'spire', region:'revel',  x:245, y:395, name:'레블우드 고대 첨탑' },
-  { id:'s-nomad', cat:'spire', region:'nomad',  x:565, y:435, name:'유목민 고원 고대 첨탑' },
-  { id:'s-kindle',cat:'spire', region:'kindle', x:770, y:640, name:'킨들웨이스트 고대 첨탑' },
-  { id:'s-alba',  cat:'spire', region:'alba',   x:700, y:245, name:'알바네브 산맥 고대 첨탑' },
-  { id:'s-veil',  cat:'spire', region:'veil',   x:525, y:805, name:'베일워터 분지 고대 첨탑' },
-  { id:'h-spring',cat:'hall',  region:'spring', x:385, y:765, name:'할로우 홀 · 봄의 땅' },
-  { id:'h-revel', cat:'hall',  region:'revel',  x:345, y:285, name:'할로우 홀 · 레블우드' },
-  { id:'h-nomad', cat:'hall',  region:'nomad',  x:480, y:525, name:'할로우 홀 · 유목민 고원' },
-  { id:'h-kindle',cat:'hall',  region:'kindle', x:715, y:740, name:'할로우 홀 · 킨들웨이스트' },
-  { id:'h-alba',  cat:'hall',  region:'alba',   x:790, y:325, name:'할로우 홀 · 알바네브 산맥' },
-].map(m => ({ ...m, approx:true }));
+/* ───────── 데이터 ───────── */
+const STR = D.str;                       // [[en, ko], ...]
+const tr = i => i < 0 ? null : { en: STR[i][0], ko: STR[i][1] || STR[i][0] };
+const MARKERS = D.markers.map(a => ({ id:a[0], g:a[1], x:a[2], y:a[3], name:tr(a[4]), desc:tr(a[5]), region:a[6], article:a[7] }));
+const REG = D.regions;
+const [X0, X1, Y0, Y1] = D.raster.bounds, WW = X1 - X0, WH = Y1 - Y0;
+const toW = m => [m.x - X0, Y1 - m.y];           // 위키 좌표 → 화면 월드 좌표 (y 뒤집기)
 
-/* ───────── 저장 ───────── */
 const store = {
   get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
-const found  = new Set(store.get('emb.found', []));
-const hidden = new Set(store.get('emb.hidden', []));
-let custom   = store.get('emb.custom', []);
-const saveFound  = () => store.set('emb.found', [...found]);
-const saveHidden = () => store.set('emb.hidden', [...hidden]);
-const saveCustom = () => store.set('emb.custom', custom);
-const allMarkers = () => BUILTIN.concat(custom);
+const found = new Set(store.get('emb2.found', []));
+const hidden = new Set(store.get('emb2.hidden', GROUPS.filter(g => !g.def).map(g => g.id)));
+const saveFound = () => store.set('emb2.found', [...found]);
+const saveHidden = () => store.set('emb2.hidden', [...hidden]);
+const byGroup = {}; MARKERS.forEach(m => (byGroup[m.g] = byGroup[m.g] || []).push(m));
+const SECTIONS = [...new Set(GROUPS.map(g => g.sec))];
+const $ = id => document.getElementById(id);
+function el(tag, props = {}, text){ const e = document.createElement(tag); Object.assign(e, props); if (text != null) e.textContent = text; return e; }
 
-/* ───────── 아이콘 ───────── */
-function icon(catId, size=30){
-  const c = CAT[catId] || CAT.note;
-  return `<svg viewBox="0 0 30 30" width="${size}" height="${size}" aria-hidden="true">
-    <circle cx="15" cy="15" r="13" fill="#161920" stroke="${c.c}" stroke-width="2"/>
-    <g transform="translate(7 7)"><path d="${G[catId] || G.note}" fill="${c.c}" fill-rule="evenodd"/></g></svg>`;
-}
-
-/* ───────── 지형 생성 ───────── */
+/* ───────── 지형 ───────── */
 function hash(x, y){ let h = Math.imul(x|0, 374761393) ^ Math.imul(y|0, 668265263) ^ 0x5bd1e995;
   h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
-function vnoise(x, y){ const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
-  const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf);
-  const a = hash(xi,yi), b = hash(xi+1,yi), c = hash(xi,yi+1), d = hash(xi+1,yi+1);
-  return a + (b-a)*u + (c-a)*v + (a-b-c+d)*u*v; }
-function fbm(x, y, o=4){ let s = 0, a = .5, f = 1; for (let i = 0; i < o; i++){ s += a*vnoise(x*f, y*f); f *= 2; a *= .5; } return s / (1 - Math.pow(.5, o)); }
+function vnoise(x, y){ const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf);
+  const a = hash(xi,yi), b = hash(xi+1,yi), c = hash(xi,yi+1), d = hash(xi+1,yi+1); return a + (b-a)*u + (c-a)*v + (a-b-c+d)*u*v; }
+function fbm(x, y, o = 4){ let s = 0, a = .5, f = 1; for (let i = 0; i < o; i++){ s += a*vnoise(x*f, y*f); f *= 2; a *= .5; } return s / (1 - Math.pow(.5, o)); }
 
 function drawTerrain(){
-  const cv = document.getElementById('terrain'), N = cv.width, k = 1000 / N;
-  const ctx = cv.getContext('2d'), img = ctx.createImageData(N, N), px = img.data;
-  const land = new Uint8Array(N*N), reg = new Uint8Array(N*N), hgt = new Float32Array(N*N), coastD = new Float32Array(N*N);
-  const alba = RG.alba;
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
-    const i = y*N + x, wx = x*k, wy = y*k, nx = wx/1000, ny = wy/1000;
-    const dx = (nx - .5)/.46, dy = (ny - .52)/.44;
-    const dd = Math.hypot(dx, dy) + (fbm(nx*4, ny*4) - .5)*.5;
-    coastD[i] = dd;
-    if (dd >= .95) continue;
-    land[i] = 1;
-    const qx = wx + (fbm(nx*3+7, ny*3+1) - .5)*260, qy = wy + (fbm(nx*3+2, ny*3+9) - .5)*260;
-    let best = 0, bd = 1e12;
-    for (let r = 0; r < REGIONS.length; r++){ const R = REGIONS[r], e = (qx-R.x)**2 + (qy-R.y)**2; if (e < bd){ bd = e; best = r; } }
-    reg[i] = best;
-    let h = fbm(nx*5+11, ny*5+3, 5);
-    h += Math.max(0, 1 - Math.hypot(wx-alba.x, wy-alba.y)/260) * .55;
-    hgt[i] = h;
+  const R = D.raster, N = R.n, grid = Uint8Array.from(atob(R.grid), c => c.charCodeAt(0));
+  const cv = $('terrain'), CW = 1200, CH = Math.round(CW * WH / WW);
+  cv.width = CW; cv.height = CH;
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(CW, CH), px = img.data, reg = new Uint8Array(CW*CH), hgt = new Float32Array(CW*CH);
+  const cols = R.ids.map(id => REG[id].rgb);
+  for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++){
+    const i = y*CW + x, nx = x / CW * 8, ny = y / CH * 8;
+    const gx = (x + .5)/CW*N + (fbm(nx+3, ny+7) - .5)*9, gy = (y + .5)/CH*N + (fbm(nx+11, ny+1) - .5)*9;
+    const ci = Math.max(0, Math.min(N-1, gx|0)), cj = Math.max(0, Math.min(N-1, gy|0));
+    reg[i] = grid[cj*N + ci];
+    hgt[i] = fbm(nx*1.6 + 20, ny*1.6 + 20, 5);
   }
   const lerp = (a, b, t) => a + (b - a)*t;
-  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
-    const i = y*N + x, o = i*4; let r, g, b;
-    if (!land[i]){
-      const t = Math.min(1, Math.max(0, (coastD[i] - .95)*4)), n = (hash(x*3, y*7) - .5)*6;
-      r = lerp(46, 17, t) + n; g = lerp(74, 26, t) + n; b = lerp(90, 35, t) + n;
+  for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++){
+    const i = y*CW + x, o = i*4, r0 = reg[i]; let r, g, b;
+    if (!r0){
+      const n = (hash(x, y*3) - .5)*5 + (fbm(x/90, y/90) - .5)*14;
+      r = 24 + n; g = 33 + n; b = 42 + n;
     } else {
-      const R = REGIONS[reg[i]], h = hgt[i];
-      const up = i >= N+1 ? hgt[i-N-1] : h;
-      const shade = Math.min(1, Math.max(0, .5 + (h - up)*60));
-      const m = (.62 + .55*shade) * (.88 + .24*h);
-      [r, g, b] = R.rgb.map(c => c*m);
-      if (R.id === 'veil' && fbm(x*k/1000*10+3, y*k/1000*10+5) > .64){ r = 50; g = 92; b = 102; }
-      if (R.id === 'nomad' || R.id === 'alba'){ const s = Math.max(0, h - .78)*3; r = lerp(r, 235, s); g = lerp(g, 238, s); b = lerp(b, 242, s); }
-      const edge = (x+1 < N && land[i+1] && reg[i+1] !== reg[i]) || (y+1 < N && land[i+N] && reg[i+N] !== reg[i]);
-      if (edge){ r *= .55; g *= .55; b *= .55; }
-      const shore = (x+1 < N && !land[i+1]) || (x > 0 && !land[i-1]) || (y+1 < N && !land[i+N]) || (y > 0 && !land[i-N]);
-      if (shore){ r = 214; g = 198; b = 152; }
-      const n = (hash(x, y) - .5)*8; r += n; g += n; b += n;
+      const h = hgt[i], up = i >= CW+1 ? hgt[i-CW-1] : h;
+      const shade = Math.min(1, Math.max(0, .5 + (h - up)*55));
+      const m = (.66 + .5*shade) * (.86 + .26*h);
+      [r, g, b] = cols[r0-1].map(c => c*m);
+      if (R.ids[r0-1] === 'veil' && fbm(x/40+3, y/40+5) > .66){ r = 48; g = 88; b = 98; }
+      if ((R.ids[r0-1] === 'alba' || R.ids[r0-1] === 'nomad') && h > .74){ const s = (h - .74)*3; r = lerp(r, 236, s); g = lerp(g, 239, s); b = lerp(b, 243, s); }
+      const e = (x+1 < CW && reg[i+1] && reg[i+1] !== r0) || (y+1 < CH && reg[i+CW] && reg[i+CW] !== r0);
+      if (e){ r *= .5; g *= .5; b *= .5; }
+      const shore = (x+1 < CW && !reg[i+1]) || (x > 0 && !reg[i-1]) || (y+1 < CH && !reg[i+CW]) || (y > 0 && !reg[i-CW]);
+      if (shore){ r = 196; g = 182; b = 140; }
+      const n = (hash(x, y) - .5)*7; r += n; g += n; b += n;
     }
     px[o] = r; px[o+1] = g; px[o+2] = b; px[o+3] = 255;
   }
   ctx.putImageData(img, 0, 0);
-  document.getElementById('loading').hidden = true;
+  // 1000 단위 격자
+  ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1;
+  for (let v = Math.ceil(X0/1000)*1000; v < X1; v += 1000){ const x = (v - X0)/WW*CW; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CH); ctx.stroke(); }
+  for (let v = Math.ceil(Y0/1000)*1000; v < Y1; v += 1000){ const y = (Y1 - v)/WH*CH; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CW, y); ctx.stroke(); }
+  $('loading').hidden = true;
 }
 
-/* ───────── 뷰 (이동/확대) ───────── */
-const mapEl = document.getElementById('map'), world = document.getElementById('world');
-const pinsEl = document.getElementById('pins'), labelsEl = document.getElementById('labels');
-const pop = document.getElementById('pop');
+/* ───────── 뷰 ───────── */
+const mapEl = $('map'), world = $('world'), pinsEl = $('pins'), labelsEl = $('labels'), pop = $('pop');
+world.style.width = WW + 'px'; world.style.height = WH + 'px';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let view = { s:1, tx:0, ty:0 }, fitS = 1;
+let view = { s:.1, tx:0, ty:0 }, fitS = .1, laidOutS = -1;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-function fit(){
+function fitView(){
   const r = mapEl.getBoundingClientRect();
-  fitS = Math.min(r.width, r.height) / 1000 * .96;
-  view = { s:fitS, tx:(r.width - 1000*fitS)/2, ty:(r.height - 1000*fitS)/2 };
+  const s = Math.min(r.width / WW, r.height / WH) * .96;
+  return { s, tx:(r.width - WW*s)/2, ty:(r.height - WH*s)/2 };
 }
-function toScreen(x, y){ return [view.tx + x*view.s, view.ty + y*view.s]; }
-function toWorld(sx, sy){ return [(sx - view.tx)/view.s, (sy - view.ty)/view.s]; }
 function zoomAt(f, cx, cy){
-  const ns = clamp(view.s*f, fitS*.6, fitS*8), q = ns/view.s;
+  const ns = clamp(view.s*f, fitS*.7, fitS*14), q = ns/view.s;
   view.tx = cx - (cx - view.tx)*q; view.ty = cy - (cy - view.ty)*q; view.s = ns; apply();
 }
-function flyTo(x, y, s){
-  const r = mapEl.getBoundingClientRect(), from = { ...view };
-  const to = { s, tx:r.width/2 - x*s, ty:r.height/2 - y*s };
+function flyTo(wx, wy, s){
+  const r = mapEl.getBoundingClientRect(), from = { ...view }, to = { s, tx:r.width/2 - wx*s, ty:r.height/2 - wy*s };
   if (reduce){ view = to; apply(); return; }
   const t0 = performance.now();
-  (function step(t){ const p = Math.min(1, (t - t0)/420), e = 1 - Math.pow(1 - p, 3);
+  (function step(t){ const p = Math.min(1, (t - t0)/450), e = 1 - Math.pow(1 - p, 3);
     view = { s:from.s + (to.s-from.s)*e, tx:from.tx + (to.tx-from.tx)*e, ty:from.ty + (to.ty-from.ty)*e };
     apply(); if (p < 1) requestAnimationFrame(step); })(t0);
 }
-
-let pinEls = new Map(), labelEls = [], popAnchor = null;
+let pinEls = [], labelEls = [], popM = null;
 function apply(){
   world.style.transform = `translate(${view.tx}px,${view.ty}px) scale(${view.s})`;
-  for (const [m, el] of pinEls){ const [sx, sy] = toScreen(m.x, m.y); el.style.transform = `translate(${sx-15}px,${sy-15}px)`; }
-  for (const { r, el } of labelEls){ const [sx, sy] = toScreen(r.x, r.y - 38); el.style.transform = `translate(${sx}px,${sy}px) translate(-50%,-50%)`; }
+  const t = `translate(${view.tx}px,${view.ty}px)`;
+  pinsEl.style.transform = t; labelsEl.style.transform = t;
+  if (laidOutS !== view.s){
+    laidOutS = view.s;
+    pinsEl.style.setProperty('--ps', clamp(.45 + .22*(view.s/fitS), .55, 1).toFixed(3));
+    for (const { m, e } of pinEls){ const [wx, wy] = toW(m), h = e.classList.contains('sm') ? 10 : 14; e.style.transform = `translate(${wx*view.s - h}px,${wy*view.s - h}px)`; }
+    for (const { r, e } of labelEls){ e.style.transform = `translate(${(r.c[0]-X0)*view.s}px,${(Y1-r.c[1])*view.s}px) translate(-50%,-50%)`; }
+  }
   placePop();
 }
 
 /* ───────── 핀 ───────── */
-const qEl = document.getElementById('q');
 function renderPins(){
-  pinsEl.textContent = ''; pinEls = new Map();
-  for (const m of allMarkers()){
-    if (hidden.has(m.cat)) continue;
-    const b = document.createElement('button');
-    b.className = 'pin' + (found.has(m.id) ? ' found' : '') + (popAnchor && popAnchor.id === m.id ? ' active' : '');
-    b.innerHTML = icon(m.cat);
-    b.setAttribute('aria-label', `${m.name} (${CAT[m.cat].name})`);
-    b.addEventListener('click', e => { e.stopPropagation(); openMarker(m); });
-    pinsEl.appendChild(b); pinEls.set(m, b);
+  pinsEl.textContent = ''; pinEls = [];
+  const hideFound = $('hideFound').checked;
+  const frag = document.createDocumentFragment();
+  for (const m of MARKERS){
+    if (hidden.has(m.g)) continue;
+    const g = GI[m.g], f = found.has(m.id);
+    const b = el('button', { className:'pin' + (g.small ? ' sm' : '') + (f ? ' found' : '') + (f && hideFound ? ' hidefound' : '') + (popM === m ? ' active' : '') });
+    b.innerHTML = icon(m.g, g.small ? 20 : 28);
+    b.setAttribute('aria-label', `${m.name.ko} (${g.ko})`);
+    b.addEventListener('click', ev => { ev.stopPropagation(); openMarker(m); });
+    frag.append(b); pinEls.push({ m, e:b });
   }
-  apply();
+  pinsEl.append(frag); laidOutS = -1; apply();
 }
 function renderLabels(){
   labelsEl.textContent = ''; labelEls = [];
-  for (const r of REGIONS){
-    const el = document.createElement('div'); el.className = 'label';
-    el.innerHTML = `<b></b><small></small>`; el.querySelector('b').textContent = r.name; el.querySelector('small').textContent = r.en;
-    labelsEl.appendChild(el); labelEls.push({ r, el });
+  for (const id of D.raster.ids){
+    const r = REG[id]; if (!r.c || r.c[2] < 20) continue;
+    const e = el('div', { className:'label' }); e.append(el('b', {}, r.ko), el('small', {}, r.en));
+    labelsEl.append(e); labelEls.push({ r, e });
   }
 }
 
 /* ───────── 팝업 ───────── */
 function placePop(){
-  if (pop.hidden || !popAnchor) return;
-  const [sx, sy] = toScreen(popAnchor.x, popAnchor.y);
-  const W = mapEl.clientWidth, pw = pop.offsetWidth, ph = pop.offsetHeight;
-  let left = clamp(sx - pw/2, 8, W - pw - 8), top = sy - ph - 24;
-  if (top < 8) top = sy + 24;
+  if (pop.hidden || !popM) return;
+  const [wx, wy] = toW(popM), sx = view.tx + wx*view.s, sy = view.ty + wy*view.s;
+  const W = mapEl.clientWidth, H = mapEl.clientHeight, pw = pop.offsetWidth, ph = pop.offsetHeight;
+  let left = clamp(sx - pw/2, 12, W - pw - 12), top = sy - ph - 22;
+  if (top < 12) top = Math.min(sy + 22, H - ph - 12);
   pop.style.transform = `translate(${left}px,${top}px)`;
 }
-function closePop(){ pop.hidden = true; popAnchor = null; pinEls.forEach(el => el.classList.remove('active')); }
-function el(tag, props = {}, text){ const e = document.createElement(tag); Object.assign(e, props); if (text != null) e.textContent = text; return e; }
-
+function closePop(){ pop.hidden = true; popM = null; pinEls.forEach(p => p.e.classList.remove('active')); }
+function setFound(m, v){ v ? found.add(m.id) : found.delete(m.id); saveFound(); renderPins(); renderSide(); if (!$('list').hidden) renderList(); }
 function openMarker(m){
-  popAnchor = m; pop.textContent = '';
-  const cat = CAT[m.cat], rg = RG[m.region];
-  const hd = el('div', { className:'hd' }); hd.innerHTML = icon(m.cat, 26);
-  const t = el('div'); t.append(el('h3', {}, m.name), el('div', { className:'meta' }, cat.name + (rg ? ' · ' + rg.name : '')));
+  popM = m; pop.textContent = '';
+  const g = GI[m.g], r = REG[m.region];
+  const hd = el('div', { className:'hd' }); hd.innerHTML = icon(m.g, 28);
+  const t = el('div'); t.append(el('h3', {}, m.name.ko));
+  if (m.name.en !== m.name.ko) t.append(el('div', { className:'en' }, m.name.en));
+  t.append(el('div', { className:'meta' }, g.ko + (r ? ' · ' + r.ko : '')));
   hd.append(t); pop.append(hd);
   const x = el('button', { className:'x', ariaLabel:'닫기' }, '✕'); x.onclick = closePop; pop.append(x);
-  const desc = m.desc || cat.d; if (desc) pop.append(el('p', {}, desc));
-  if (m.memo) pop.append(el('p', {}, m.memo));
-  if (m.approx) pop.append(el('span', { className:'tag' }, '대략적인 위치'));
-  const lab = el('label', { className:'check' });
-  const cb = el('input', { type:'checkbox', id:'found-' + m.id, checked:found.has(m.id) });
-  cb.onchange = () => { cb.checked ? found.add(m.id) : found.delete(m.id); saveFound(); renderPins(); renderSide(); };
-  lab.append(cb, document.createTextNode(' 찾음으로 표시')); pop.append(lab);
-  if (m.custom){
-    const del = el('button', { className:'btn danger' }, '마커 삭제');
-    del.onclick = () => {
-      if (!del.classList.contains('arm')){ del.classList.add('arm'); del.textContent = '한 번 더 누르면 삭제'; return; }
-      custom = custom.filter(c => c.id !== m.id); found.delete(m.id); saveCustom(); saveFound(); closePop(); renderPins(); renderSide();
-    };
-    pop.append(del);
-  }
-  pop.hidden = false; renderPinsActive(); placePop();
+  if (m.desc && m.desc.ko) pop.append(el('p', {}, m.desc.ko));
+  const foot = el('div', { className:'foot' });
+  const lab = el('label', { className:'check' }), cb = el('input', { type:'checkbox', id:'pf-' + m.id, checked:found.has(m.id) });
+  cb.onchange = () => setFound(m, cb.checked);
+  lab.append(cb, document.createTextNode(' 찾음'));
+  foot.append(lab);
+  if (m.article) foot.append(el('a', { href:'https://enshrouded.wiki.gg/wiki/' + encodeURI(m.article.replace(/ /g, '_')), target:'_blank', rel:'noopener' }, '위키에서 보기 ↗'));
+  pop.append(foot);
+  pop.hidden = false; pinEls.forEach(p => p.e.classList.toggle('active', p.m === m)); placePop();
 }
-function renderPinsActive(){ for (const [m, e] of pinEls) e.classList.toggle('active', !!popAnchor && popAnchor.id === m.id); }
-
-function openAddForm(x, y){
-  popAnchor = { id:'__new', x, y }; pop.textContent = '';
-  pop.append(el('h3', {}, '새 마커'));
-  const x0 = el('button', { className:'x', ariaLabel:'닫기' }, '✕'); x0.onclick = closePop; pop.append(x0);
-  const nearest = REGIONS.reduce((a, r) => Math.hypot(r.x-x, r.y-y) < Math.hypot(a.x-x, a.y-y) ? r : a);
-  pop.append(el('div', { className:'meta' }, `${nearest.name} 부근 · 좌표 ${Math.round(x)}, ${Math.round(y)}`));
-  const f1 = el('label', { className:'f' }, '이름'); const nm = el('input', { type:'text', id:'f-name', placeholder:'예: 구리 광맥', maxLength:40 }); f1.append(nm);
-  const f2 = el('label', { className:'f' }, '종류'); const sel = el('select', { id:'f-cat' });
-  CATS.forEach(c => sel.append(el('option', { value:c.id, selected:c.id === 'note' }, c.name))); f2.append(sel);
-  const f3 = el('label', { className:'f' }, '메모 (선택)'); const memo = el('textarea', { id:'f-memo', rows:2, maxLength:200 }); f3.append(memo);
-  const row = el('div', { className:'row' });
-  const ok = el('button', { className:'btn primary' }, '저장'), no = el('button', { className:'btn' }, '취소');
-  ok.onclick = () => {
-    const name = nm.value.trim() || CAT[sel.value].name;
-    const m = { id:'c' + Date.now().toString(36), custom:true, cat:sel.value, region:nearest.id, x, y, name, memo:memo.value.trim() };
-    custom.push(m); saveCustom(); hidden.delete(m.cat); saveHidden(); setAdd(false); renderPins(); renderSide(); openMarker(m);
-  };
-  no.onclick = closePop;
-  row.append(no, ok); pop.append(f1, f2, f3, row);
-  pop.hidden = false; placePop(); nm.focus();
+function goTo(m){
+  if (hidden.has(m.g)){ hidden.delete(m.g); saveHidden(); renderPins(); renderSide(); }
+  if (location.hash === '#checklist') location.hash = '#map';
+  const [wx, wy] = toW(m); flyTo(wx, wy, Math.max(view.s, fitS*5));
+  setTimeout(() => openMarker(m), reduce ? 0 : 470); closeSide();
 }
 
 /* ───────── 사이드바 ───────── */
 function renderSide(){
-  const all = allMarkers(), vis = all.filter(m => !hidden.has(m.cat));
-  const f = vis.filter(m => found.has(m.id)).length;
-  document.getElementById('progTxt').textContent = `${f} / ${vis.length}`;
-  document.getElementById('progBar').style.width = vis.length ? (f / vis.length * 100) + '%' : '0';
-  const cats = document.getElementById('cats'); cats.textContent = '';
-  for (const c of CATS){
-    const list = all.filter(m => m.cat === c.id), fc = list.filter(m => found.has(m.id)).length;
-    const b = el('button', { className:'cat' + (list.length ? '' : ' zero') });
-    b.setAttribute('aria-pressed', String(!hidden.has(c.id)));
-    b.title = list.length ? '' : '아직 없음 · 직접 추가할 수 있어요';
-    b.innerHTML = icon(c.id, 22);
-    b.append(el('span', { className:'nm' }, c.name), el('span', { className:'ct' }, list.length ? `${fc}/${list.length}` : '–'));
-    b.onclick = () => { hidden.has(c.id) ? hidden.delete(c.id) : hidden.add(c.id); saveHidden(); if (popAnchor && popAnchor.cat === c.id) closePop(); renderPins(); renderSide(); };
-    cats.append(b);
+  const box = $('sections'); box.textContent = '';
+  for (const sec of SECTIONS){
+    const gs = GROUPS.filter(g => g.sec === sec && byGroup[g.id]);
+    const wrap = el('div'), head = el('div', { className:'sec-title' }, sec);
+    const allOn = gs.every(g => !hidden.has(g.id));
+    const tog = el('button', {}, allOn ? '모두 숨김' : '모두 표시');
+    tog.onclick = () => { gs.forEach(g => allOn ? hidden.add(g.id) : hidden.delete(g.id)); saveHidden(); renderPins(); renderSide(); };
+    head.append(tog); wrap.append(head);
+    const grid = el('div', { className:'cats' });
+    for (const g of gs){
+      const list = byGroup[g.id], fc = list.filter(m => found.has(m.id)).length;
+      const b = el('button', { className:'cat', title:g.en });
+      b.setAttribute('aria-pressed', String(!hidden.has(g.id)));
+      b.innerHTML = icon(g.id, 22);
+      b.append(el('span', { className:'nm' }, g.ko), el('span', { className:'ct' }, fc ? `${fc}/${list.length}` : String(list.length)));
+      b.onclick = () => { hidden.has(g.id) ? hidden.delete(g.id) : hidden.add(g.id); saveHidden(); if (popM && popM.g === g.id) closePop(); renderPins(); renderSide(); };
+      grid.append(b);
+    }
+    wrap.append(grid); box.append(wrap);
   }
-  runSearch();
+  renderTracker();
 }
-function renderRegions(){
-  const box = document.getElementById('regions');
-  for (const r of REGIONS){
-    const b = el('button');
-    const sw = el('span', { className:'sw' }); sw.style.background = `rgb(${r.rgb})`;
-    b.append(sw, el('span', {}, r.name), el('span', { className:'en' }, r.en));
-    b.onclick = () => { flyTo(r.x, r.y, fitS*2.4); closeSide(); };
-    box.append(b);
+function renderTracker(){
+  const ul = $('trackList'); ul.textContent = '';
+  for (const g of GROUPS.filter(g => g.track && byGroup[g.id])){
+    const list = byGroup[g.id], fc = list.filter(m => found.has(m.id)).length;
+    const li = el('li'); li.innerHTML = icon(g.id, 20);
+    const bar = el('div', { className:'bar' + (fc === list.length ? ' done' : '') }), i = el('i'); i.style.width = (fc / list.length * 100) + '%'; bar.append(i);
+    li.append(el('span', {}, g.ko), el('span', { className:'num' }, `${fc}/${list.length}`), bar); ul.append(li);
   }
 }
+const qEl = $('q');
 function runSearch(){
-  const q = qEl.value.trim().toLowerCase(), ul = document.getElementById('results');
-  ul.textContent = ''; ul.hidden = !q; if (!q) return;
-  const hits = allMarkers().filter(m => (m.name + ' ' + CAT[m.cat].name + ' ' + (RG[m.region]?.name || '')).toLowerCase().includes(q)).slice(0, 8);
-  if (!hits.length){ ul.append(el('li', { className:'empty' }, '일치하는 장소가 없어요')); return; }
+  const q = qEl.value.trim().toLowerCase(), ul = $('results'); ul.textContent = ''; ul.hidden = !q; if (!q) return;
+  const hits = MARKERS.filter(m => (m.name.ko + ' ' + m.name.en + ' ' + GI[m.g].ko).toLowerCase().includes(q)).slice(0, 30);
+  if (!hits.length){ ul.append(el('li', { className:'empty' }, '일치하는 항목이 없어요')); return; }
   for (const m of hits){
-    const li = el('li'), b = el('button'); b.innerHTML = icon(m.cat, 20);
-    b.append(el('span', {}, m.name), el('small', {}, RG[m.region]?.name || ''));
-    b.onclick = () => { hidden.delete(m.cat); saveHidden(); renderPins(); renderSide(); flyTo(m.x, m.y, Math.max(view.s, fitS*3)); setTimeout(() => openMarker(m), reduce ? 0 : 440); closeSide(); };
-    li.append(b); ul.append(li);
+    const li = el('li'), b = el('button'); b.innerHTML = icon(m.g, 20);
+    const t = el('div', { className:'t' }); t.append(el('span', {}, m.name.ko), el('small', {}, `${GI[m.g].ko} · ${REG[m.region]?.ko || ''}`));
+    b.append(t); b.onclick = () => goTo(m); li.append(b); ul.append(li);
   }
 }
 qEl.addEventListener('input', runSearch);
-document.getElementById('showAll').onclick = () => { hidden.clear(); saveHidden(); renderPins(); renderSide(); };
-document.getElementById('hideAll').onclick = () => { CATS.forEach(c => hidden.add(c.id)); saveHidden(); closePop(); renderPins(); renderSide(); };
-const labelsOn = document.getElementById('labelsOn');
-labelsOn.checked = store.get('emb.labels', true);
-labelsEl.hidden = !labelsOn.checked;
-labelsOn.onchange = () => { labelsEl.hidden = !labelsOn.checked; store.set('emb.labels', labelsOn.checked); };
+$('showAll').onclick = () => { hidden.clear(); saveHidden(); renderPins(); renderSide(); };
+$('hideAll').onclick = () => { GROUPS.forEach(g => hidden.add(g.id)); saveHidden(); closePop(); renderPins(); renderSide(); };
+$('hideFound').checked = store.get('emb2.hideFound', false);
+$('hideFound').onchange = e => { store.set('emb2.hideFound', e.target.checked); renderPins(); };
+$('labelsOn').checked = store.get('emb2.labels', true); labelsEl.hidden = !$('labelsOn').checked;
+$('labelsOn').onchange = e => { labelsEl.hidden = !e.target.checked; store.set('emb2.labels', e.target.checked); };
+const tracker = $('tracker'), trackBtn = $('trackBtn');
+function setTrack(on){ tracker.hidden = !on; trackBtn.setAttribute('aria-pressed', String(on)); store.set('emb2.track', on); }
+setTrack(store.get('emb2.track', innerWidth >= 1280));
+trackBtn.onclick = () => setTrack(tracker.hidden); $('trackClose').onclick = () => setTrack(false);
 
-/* 모바일 사이드바 */
-const side = document.getElementById('side'), sideToggle = document.getElementById('sideToggle');
-let scrim = null;
-function openSide(){ side.classList.add('open'); sideToggle.setAttribute('aria-expanded', 'true');
-  scrim = el('div', { className:'scrim' }); scrim.onclick = closeSide; document.body.append(scrim); }
+const side = $('side'), sideToggle = $('sideToggle'); let scrim = null;
+function openSide(){ side.classList.add('open'); sideToggle.setAttribute('aria-expanded', 'true'); scrim = el('div', { className:'scrim' }); scrim.onclick = closeSide; document.body.append(scrim); }
 function closeSide(){ side.classList.remove('open'); sideToggle.setAttribute('aria-expanded', 'false'); scrim?.remove(); scrim = null; }
 sideToggle.onclick = openSide;
+addEventListener('keydown', e => { if (e.key === 'Escape'){ closePop(); closeSide(); } });
 
-/* ───────── 마커 추가 모드 ───────── */
-const addBtn = document.getElementById('addBtn'), hint = document.getElementById('hint');
-let adding = false;
-function setAdd(on){ adding = on; addBtn.setAttribute('aria-pressed', String(on)); mapEl.classList.toggle('adding', on); hint.hidden = !on; }
-addBtn.onclick = () => { closePop(); setAdd(!adding); };
-document.getElementById('addSide').onclick = () => { closePop(); closeSide(); setAdd(true); };
-addEventListener('keydown', e => { if (e.key === 'Escape'){ setAdd(false); closePop(); closeSide(); } });
+/* ───────── 체크리스트 ───────── */
+const openGroups = new Set(store.get('emb2.open', []));
+function renderList(){
+  const box = $('listIn'), sc = $('list').scrollTop; box.textContent = '';
+  box.append(el('h2', {}, '100% 체크리스트'), el('p', { className:'lead' }, '찾은 항목에 체크하면 지도와 진행 상황에 같이 반영됩니다. 이름 옆 ➜ 를 누르면 지도에서 위치를 보여 줍니다.'));
+  const all = MARKERS.filter(m => GI[m.g].track), fa = all.filter(m => found.has(m.id)).length;
+  const ov = el('div', { className:'overall' }), t = el('div', { className:'t' });
+  t.append(el('span', {}, '전체 진행도'), el('b', {}, `${fa} / ${all.length} · ${Math.round(fa / all.length * 100)}%`));
+  const bar = el('div', { className:'bar' }), i = el('i'); i.style.width = (fa / all.length * 100) + '%'; bar.append(i); ov.append(t, bar); box.append(ov);
+  for (const sec of SECTIONS){
+    const gs = GROUPS.filter(g => g.sec === sec && g.track && byGroup[g.id]); if (!gs.length) continue;
+    box.append(el('div', { className:'sec' }, sec));
+    for (const g of gs){
+      const list = byGroup[g.id], fc = list.filter(m => found.has(m.id)).length;
+      const d = el('details', { className:'grp', open:openGroups.has(g.id) });
+      d.ontoggle = () => { d.open ? openGroups.add(g.id) : openGroups.delete(g.id); store.set('emb2.open', [...openGroups]); };
+      const s = el('summary'); s.innerHTML = icon(g.id, 22);
+      const nm = el('span', { className:'nm' }, g.ko); nm.append(el('small', {}, g.en));
+      const b2 = el('div', { className:'bar' + (fc === list.length ? ' done' : '') }), i2 = el('i'); i2.style.width = (fc / list.length * 100) + '%'; b2.append(i2);
+      s.append(nm, b2, el('span', { className:'num' }, `${fc} / ${list.length}`)); d.append(s);
+      const items = el('div', { className:'items' });
+      for (const m of [...list].sort((a, b) => (a.region + a.name.ko).localeCompare(b.region + b.name.ko, 'ko'))){
+        const it = el('label', { className:'item' + (found.has(m.id) ? ' done' : '') });
+        const cb = el('input', { type:'checkbox', id:'cl-' + m.id, checked:found.has(m.id) }); cb.onchange = () => setFound(m, cb.checked);
+        const go = el('button', { className:'go', title:'지도에서 보기', ariaLabel:'지도에서 보기' }, '➜'); go.onclick = e => { e.preventDefault(); goTo(m); };
+        it.append(cb, el('span', { title:`${m.name.en} · ${REG[m.region]?.ko || ''}` }, m.name.ko + (REG[m.region] ? ` · ${REG[m.region].ko}` : '')), go);
+        items.append(it);
+      }
+      d.append(items); box.append(d);
+    }
+  }
+  $('list').scrollTop = sc;
+}
 
-/* ───────── 입력 (드래그·휠·핀치) ───────── */
+/* ───────── 라우팅 ───────── */
+function route(){
+  const isList = location.hash === '#checklist';
+  $('list').hidden = !isList; mapEl.hidden = isList;
+  $('tabMap').removeAttribute('aria-current'); $('tabList').removeAttribute('aria-current');
+  (isList ? $('tabList') : $('tabMap')).setAttribute('aria-current', 'page');
+  if (isList) renderList(); else { laidOutS = -1; apply(); }
+  closeSide();
+}
+addEventListener('hashchange', route);
+
+/* ───────── 입력 ───────── */
 const pts = new Map(); let moved = 0, pinch = null;
 mapEl.addEventListener('pointerdown', e => {
-  if (e.target.closest('.pin,.pop,.ctrl,.side-toggle')) return;
+  if (e.target.closest('.pin,.pop,.ctrl,.tracker')) return;
   mapEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
   if (pts.size === 1) moved = 0;
   if (pts.size === 2){ const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x-b.x, a.y-b.y); }
   mapEl.classList.add('dragging');
 });
 mapEl.addEventListener('pointermove', e => {
+  const r = mapEl.getBoundingClientRect(), wx = (e.clientX - r.left - view.tx)/view.s + X0, wy = Y1 - (e.clientY - r.top - view.ty)/view.s;
+  $('coords').textContent = `X ${Math.round(wx)} · Y ${Math.round(wy)}`;
   if (!pts.has(e.pointerId)) return;
-  const p = pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y;
-  p.x = e.clientX; p.y = e.clientY;
+  const p = pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
   if (pts.size === 1){ view.tx += dx; view.ty += dy; moved += Math.abs(dx) + Math.abs(dy); apply(); }
-  else if (pts.size === 2){
-    const [a, b] = [...pts.values()], d = Math.hypot(a.x-b.x, a.y-b.y), r = mapEl.getBoundingClientRect();
-    if (pinch) zoomAt(d / pinch, (a.x+b.x)/2 - r.left, (a.y+b.y)/2 - r.top);
-    pinch = d; moved += 99;
-  }
+  else if (pts.size === 2){ const [a, b] = [...pts.values()], d = Math.hypot(a.x-b.x, a.y-b.y); if (pinch) zoomAt(d / pinch, (a.x+b.x)/2 - r.left, (a.y+b.y)/2 - r.top); pinch = d; moved += 99; }
 });
 function up(e){
   if (!pts.has(e.pointerId)) return;
   pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
-  if (pts.size === 0){
-    mapEl.classList.remove('dragging');
-    if (moved < 6){
-      const r = mapEl.getBoundingClientRect(), [wx, wy] = toWorld(e.clientX - r.left, e.clientY - r.top);
-      if (adding && wx >= 0 && wy >= 0 && wx <= 1000 && wy <= 1000) openAddForm(wx, wy);
-      else closePop();
-    }
-  }
+  if (!pts.size){ mapEl.classList.remove('dragging'); if (moved < 6) closePop(); }
 }
 mapEl.addEventListener('pointerup', up); mapEl.addEventListener('pointercancel', up);
-mapEl.addEventListener('wheel', e => {
-  if (e.target.closest('.pop')) return;
-  e.preventDefault(); const r = mapEl.getBoundingClientRect();
-  zoomAt(Math.exp(-e.deltaY * .0015), e.clientX - r.left, e.clientY - r.top);
-}, { passive:false });
+mapEl.addEventListener('wheel', e => { if (e.target.closest('.pop,.tracker')) return; e.preventDefault(); const r = mapEl.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY*.0015), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
 const center = () => { const r = mapEl.getBoundingClientRect(); return [r.width/2, r.height/2]; };
-document.getElementById('zin').onclick  = () => zoomAt(1.4, ...center());
-document.getElementById('zout').onclick = () => zoomAt(1/1.4, ...center());
-document.getElementById('zfit').onclick = () => { const s = view; fit(); const t = view; view = s; flyTo(500, 500, t.s); };
-let lastW = 0;
-new ResizeObserver(() => { const w = mapEl.clientWidth; if (!lastW){ fit(); } lastW = w; apply(); }).observe(mapEl);
+$('zin').onclick = () => zoomAt(1.5, ...center());
+$('zout').onclick = () => zoomAt(1/1.5, ...center());
+$('zfit').onclick = () => { const f = fitView(); flyTo(WW/2, WH/2, f.s); };
+let booted = false;
+new ResizeObserver(() => { if (!mapEl.clientWidth) return; if (!booted){ booted = true; view = fitView(); fitS = view.s; } laidOutS = -1; apply(); }).observe(mapEl);
 
 /* ───────── 시작 ───────── */
-renderLabels(); renderRegions(); renderSide(); fit(); renderPins();
+renderLabels(); renderSide(); renderPins(); route();
 requestAnimationFrame(() => setTimeout(drawTerrain, 20));
 })();
 </script>

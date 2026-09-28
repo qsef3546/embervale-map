@@ -70,14 +70,14 @@ a{color:var(--shroud)}
 .main{position:relative;overflow:hidden;min-width:0}
 .map{position:absolute;inset:0;background:var(--ocean);touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .map.dragging{cursor:grabbing}
-.world{position:absolute;left:0;top:0;transform-origin:0 0}
+.world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 .world canvas{display:block;width:100%;height:100%}
-.layer{position:absolute;left:0;top:0;width:0;height:0}
+.layer{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform}
 .label{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;color:#f4efe3;text-shadow:0 1px 2px #000,0 0 10px rgba(0,0,0,.8);pointer-events:none}
 .label b{display:block;font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.14em}
 .label small{display:block;font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.7;margin-top:1px}
 .pin{position:absolute;left:0;top:0;width:28px;height:28px;padding:0;border:0;background:none;cursor:pointer;border-radius:50%}
-.pin svg{display:block;width:28px;height:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.65));transition:transform .12s;transform:scale(var(--ps,1))}
+.pin svg{display:block;width:28px;height:28px;transition:transform .12s;transform:scale(var(--ps,1))}
 .pin.sm,.pin.sm svg{width:20px;height:20px}
 .pin:hover svg,.pin.active svg{transform:scale(calc(var(--ps,1) * 1.3))}
 .pin:hover,.pin.active{z-index:2}
@@ -240,7 +240,7 @@ const GL = {
 const GROUPS = D.groups, GI = Object.fromEntries(GROUPS.map(g => [g.id, g]));
 function icon(gid, size = 28){
   const g = GI[gid];
-  return `<svg viewBox="0 0 30 30" width="${size}" height="${size}" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#15181f" stroke="${g.color}" stroke-width="2"/><g transform="translate(7 7)"><path d="${GL[g.glyph]}" fill="${g.color}" fill-rule="evenodd"/></g></svg>`;
+  return `<svg viewBox="0 0 30 30" width="${size}" height="${size}" aria-hidden="true"><circle cx="15" cy="16.4" r="13.4" fill="#000" fill-opacity=".45"/><circle cx="15" cy="15" r="13" fill="#15181f" stroke="${g.color}" stroke-width="2"/><g transform="translate(7 7)"><path d="${GL[g.glyph]}" fill="${g.color}" fill-rule="evenodd"/></g></svg>`;
 }
 
 /* ───────── 데이터 ───────── */
@@ -324,29 +324,58 @@ function fitView(){
   const s = Math.min(r.width / WW, r.height / WH) * .96;
   return { s, tx:(r.width - WW*s)/2, ty:(r.height - WH*s)/2 };
 }
+/* 애니메이션 루프: 줌은 목표 배율을 지수 감쇠로 따라가고, 드래그 후엔 관성으로 미끄러진다.
+   움직이는 동안은 마커 층 전체를 한 번에 변형하고, 멈추면 마커 위치를 새 배율로 다시 배치한다. */
+let zoomTo = null, anchor = [0, 0], vel = { x:0, y:0 }, coasting = false, flying = false, raf = 0, lastT = 0;
+const minS = () => fitS*.7, maxS = () => fitS*14;
+function zoomNow(f, cx, cy){
+  const ns = clamp(view.s*f, minS(), maxS()), q = ns/view.s;
+  view.tx = cx - (cx - view.tx)*q; view.ty = cy - (cy - view.ty)*q; view.s = ns;
+}
 function zoomAt(f, cx, cy){
-  const ns = clamp(view.s*f, fitS*.7, fitS*14), q = ns/view.s;
-  view.tx = cx - (cx - view.tx)*q; view.ty = cy - (cy - view.ty)*q; view.s = ns; apply();
+  flying = false; zoomTo = clamp((zoomTo ?? view.s)*f, minS(), maxS()); anchor = [cx, cy]; kick();
+}
+function kick(){ if (!raf){ lastT = performance.now(); raf = requestAnimationFrame(tick); } }
+function tick(t){
+  raf = 0; const dt = clamp(t - lastT, 1, 50); lastT = t; let busy = false;
+  if (zoomTo != null && !flying){
+    const d = Math.log(zoomTo / view.s);
+    if (Math.abs(d) < .002){ zoomNow(zoomTo / view.s, ...anchor); zoomTo = null; }
+    else { zoomNow(Math.exp(d * (1 - Math.exp(-dt/80))), ...anchor); busy = true; }
+  }
+  if (coasting && !pts.size){
+    view.tx += vel.x*dt; view.ty += vel.y*dt;
+    const k = Math.exp(-dt/220); vel.x *= k; vel.y *= k;
+    if (Math.hypot(vel.x, vel.y) < .02) coasting = false; else busy = true;
+  }
+  apply();
+  if (busy) kick(); else if (!flying && laidOutS !== view.s) layout();
 }
 function flyTo(wx, wy, s){
   const r = mapEl.getBoundingClientRect(), from = { ...view }, to = { s, tx:r.width/2 - wx*s, ty:r.height/2 - wy*s };
-  if (reduce){ view = to; apply(); return; }
-  const t0 = performance.now();
-  (function step(t){ const p = Math.min(1, (t - t0)/450), e = 1 - Math.pow(1 - p, 3);
+  zoomTo = null; coasting = false;
+  if (reduce){ view = to; layout(); apply(); return; }
+  flying = true; const t0 = performance.now();
+  (function step(t){
+    if (!flying) return;
+    const p = Math.min(1, (t - t0)/520), e = 1 - Math.pow(1 - p, 3);
     view = { s:from.s + (to.s-from.s)*e, tx:from.tx + (to.tx-from.tx)*e, ty:from.ty + (to.ty-from.ty)*e };
-    apply(); if (p < 1) requestAnimationFrame(step); })(t0);
+    apply(); if (p < 1) requestAnimationFrame(step); else { flying = false; layout(); apply(); }
+  })(t0);
 }
 let pinEls = [], labelEls = [], popM = null;
+function layout(){
+  laidOutS = view.s;
+  pinsEl.style.setProperty('--ps', clamp(.45 + .22*(view.s/fitS), .55, 1).toFixed(3));
+  for (const { m, e } of pinEls){ const [wx, wy] = toW(m), h = e.classList.contains('sm') ? 10 : 14; e.style.transform = `translate(${wx*view.s - h}px,${wy*view.s - h}px)`; }
+  for (const { r, e } of labelEls){ e.style.transform = `translate(${(r.c[0]-X0)*view.s}px,${(Y1-r.c[1])*view.s}px) translate(-50%,-50%)`; }
+}
 function apply(){
   world.style.transform = `translate(${view.tx}px,${view.ty}px) scale(${view.s})`;
-  const t = `translate(${view.tx}px,${view.ty}px)`;
+  // 배치 배율에서 너무 멀어지면(마커가 눈에 띄게 커지거나 작아지면) 중간에 한 번 재배치
+  if (laidOutS < 0 || view.s/laidOutS > 1.4 || view.s/laidOutS < .7) layout();
+  const t = `translate(${view.tx}px,${view.ty}px) scale(${view.s/laidOutS})`;
   pinsEl.style.transform = t; labelsEl.style.transform = t;
-  if (laidOutS !== view.s){
-    laidOutS = view.s;
-    pinsEl.style.setProperty('--ps', clamp(.45 + .22*(view.s/fitS), .55, 1).toFixed(3));
-    for (const { m, e } of pinEls){ const [wx, wy] = toW(m), h = e.classList.contains('sm') ? 10 : 14; e.style.transform = `translate(${wx*view.s - h}px,${wy*view.s - h}px)`; }
-    for (const { r, e } of labelEls){ e.style.transform = `translate(${(r.c[0]-X0)*view.s}px,${(Y1-r.c[1])*view.s}px) translate(-50%,-50%)`; }
-  }
   placePop(); placeTip();
 }
 
@@ -361,7 +390,9 @@ function renderPins(){
     const b = el('button', { className:'pin' + (g.small ? ' sm' : '') + (f ? ' found' : '') + (f && hideFound ? ' hidefound' : '') + (popM === m ? ' active' : '') });
     b.innerHTML = icon(m.g, g.small ? 20 : 28);
     b.setAttribute('aria-label', `${m.name.ko} (${g.ko})`);
-    b.addEventListener('click', ev => { ev.stopPropagation(); hideTip(); openMarker(m); });
+    b._m = m;
+    // 마우스·터치 클릭은 지도 pointerup에서 처리하고, 여기서는 키보드(Enter/Space)만 받는다
+    b.addEventListener('click', ev => { ev.stopPropagation(); if (ev.detail === 0){ hideTip(); openMarker(m); } });
     b.addEventListener('pointerenter', ev => { if (ev.pointerType === 'mouse' && !pts.size && popM !== m) showTip(m); });
     b.addEventListener('pointerleave', hideTip);
     frag.append(b); pinEls.push({ m, e:b });
@@ -540,29 +571,54 @@ function route(){
 addEventListener('hashchange', route);
 
 /* ───────── 입력 ───────── */
-const pts = new Map(); let moved = 0, pinch = null;
+const pts = new Map(); let moved = 0, pinch = null, lastMove = 0, mapRect = null, downPin = null;
 mapEl.addEventListener('pointerdown', e => {
-  if (e.target.closest('.pin,.pop,.ctrl,.tracker')) return;
-  mapEl.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
-  if (pts.size === 1) moved = 0;
-  if (pts.size === 2){ const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x-b.x, a.y-b.y); }
+  if (e.button > 0 || e.target.closest('.pop,.ctrl,.tracker')) return;
+  // 마커 위에서 눌러도 드래그는 되게 한다. 움직이지 않고 떼면 그 마커를 연다.
+  if (pts.size === 0) downPin = e.target.closest('.pin');
+  try { mapEl.setPointerCapture(e.pointerId); } catch {}
+  pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  mapRect = mapEl.getBoundingClientRect();
+  if (pts.size === 1){ moved = 0; coasting = false; vel = { x:0, y:0 }; lastMove = e.timeStamp; }
+  if (pts.size === 2){ const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x-b.x, a.y-b.y); zoomTo = null; }
   mapEl.classList.add('dragging'); hideTip();
 });
 mapEl.addEventListener('pointermove', e => {
-  const r = mapEl.getBoundingClientRect(), wx = (e.clientX - r.left - view.tx)/view.s + X0, wy = Y1 - (e.clientY - r.top - view.ty)/view.s;
+  const r = mapRect || mapEl.getBoundingClientRect(), wx = (e.clientX - r.left - view.tx)/view.s + X0, wy = Y1 - (e.clientY - r.top - view.ty)/view.s;
   $('coords').textContent = `X ${Math.round(wx)} · Y ${Math.round(wy)}`;
   if (!pts.has(e.pointerId)) return;
   const p = pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
-  if (pts.size === 1){ view.tx += dx; view.ty += dy; moved += Math.abs(dx) + Math.abs(dy); apply(); }
-  else if (pts.size === 2){ const [a, b] = [...pts.values()], d = Math.hypot(a.x-b.x, a.y-b.y); if (pinch) zoomAt(d / pinch, (a.x+b.x)/2 - r.left, (a.y+b.y)/2 - r.top); pinch = d; moved += 99; }
+  if (pts.size === 1){
+    flying = false; view.tx += dx; view.ty += dy; moved += Math.abs(dx) + Math.abs(dy);
+    const dt = Math.max(8, e.timeStamp - lastMove); lastMove = e.timeStamp;
+    vel.x = vel.x*.5 + (dx/dt)*.5; vel.y = vel.y*.5 + (dy/dt)*.5;   // px/ms, 관성용
+    const sp = Math.hypot(vel.x, vel.y); if (sp > 1.6){ vel.x *= 1.6/sp; vel.y *= 1.6/sp; }
+    kick();
+  } else if (pts.size === 2){
+    const [a, b] = [...pts.values()], d = Math.hypot(a.x-b.x, a.y-b.y);
+    if (pinch){ zoomNow(d / pinch, (a.x+b.x)/2 - r.left, (a.y+b.y)/2 - r.top); kick(); }
+    pinch = d; moved += 99;
+  }
 });
 function up(e){
   if (!pts.has(e.pointerId)) return;
+  const wasPinch = pts.size > 1;
   pts.delete(e.pointerId); if (pts.size < 2) pinch = null;
-  if (!pts.size){ mapEl.classList.remove('dragging'); if (moved < 6) closePop(); }
+  if (!pts.size){
+    mapEl.classList.remove('dragging'); mapRect = null;
+    if (moved < 6){ if (downPin && downPin._m){ hideTip(); openMarker(downPin._m); } else closePop(); }
+    else if (!wasPinch && e.timeStamp - lastMove < 60 && Math.hypot(vel.x, vel.y) > .15 && !reduce){ coasting = true; }
+    downPin = null;
+    kick();
+  }
 }
 mapEl.addEventListener('pointerup', up); mapEl.addEventListener('pointercancel', up);
-mapEl.addEventListener('wheel', e => { if (e.target.closest('.pop,.tracker')) return; e.preventDefault(); const r = mapEl.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY*.0015), e.clientX - r.left, e.clientY - r.top); }, { passive:false });
+mapEl.addEventListener('wheel', e => {
+  if (e.target.closest('.pop,.tracker')) return;
+  e.preventDefault(); const r = mapEl.getBoundingClientRect();
+  const dy = clamp(e.deltaMode === 1 ? e.deltaY*33 : e.deltaY, -240, 240);   // 줄 단위 스크롤 보정, 과도한 점프 방지
+  zoomAt(Math.exp(-dy*.0022), e.clientX - r.left, e.clientY - r.top);
+}, { passive:false });
 const center = () => { const r = mapEl.getBoundingClientRect(); return [r.width/2, r.height/2]; };
 $('zin').onclick = () => zoomAt(1.5, ...center());
 $('zout').onclick = () => zoomAt(1/1.5, ...center());

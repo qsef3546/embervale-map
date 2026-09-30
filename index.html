@@ -256,7 +256,7 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .cf-job .ph{display:grid;place-items:center;color:var(--dim);font-size:10px}
 .cf-job .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;padding:0}
 .cf-job .nm:hover{color:var(--ember)}
-.cf-job small{color:var(--dim);font-size:11px;flex:none}
+.cf-job small{color:var(--dim);font-size:11px;flex:none;width:62px;text-align:right}
 .cf-step{display:flex;align-items:center;flex:none}
 .cf-step button{width:24px;height:24px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);cursor:pointer;font-size:14px;line-height:1;display:grid;place-items:center}
 .cf-step button:first-child{border-radius:5px 0 0 5px;border-right:0}
@@ -858,7 +858,7 @@ function renderTodo(){
     const nm = el('button', { className:'nm' }, cName(it));
     nm.onclick = () => selectCraft(i);
     row.append(cIcon(it, ''), nm);
-    if (r && r.q > 1) row.append(el('small', {}, `1회 ${r.q}개`));
+    row.append(el('small', {}, r && r.q > 1 ? `1회 ${r.q}개` : ''));
     const step = el('div', { className:'cf-step' });
     const minus = el('button', { ariaLabel:'하나 빼기' }, '−');
     minus.onclick = () => todoBump(name, -1);
@@ -867,9 +867,7 @@ function renderTodo(){
     step.append(minus, el('span', { className:'n', title:'제작 횟수' }, String(q)), plus);
     const del = el('button', { className:'cf-del', ariaLabel:'빼기' }, '✕');
     del.onclick = () => todoDrop(name);
-    row.append(step);
-    if (r && r.q > 1) row.append(el('small', {}, `${q * r.q}개`));
-    row.append(del);
+    row.append(step, del);
     left.append(row);
   }
 

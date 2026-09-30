@@ -160,7 +160,8 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 
 
 /* 제작 */
-.craft{position:absolute;inset:0;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:320px 1fr;grid-template-rows:minmax(0,1fr) auto}
+.craft{position:absolute;inset:0;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:320px minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+.craft[data-todo="1"]{grid-template-columns:320px minmax(0,1fr) 330px}
 .cf-list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
 .cf-top{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
 .cf-chips{display:flex;flex-wrap:wrap;gap:5px}
@@ -220,12 +221,17 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .cf-more:hover{color:var(--ember)}
 .cf-empty{color:var(--dim);font-size:13px;display:grid;place-items:center;height:100%;text-align:center;padding:24px}
 
+@media (max-width:1200px){
+  .craft,.craft[data-todo="1"]{grid-template-columns:320px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .cf-todo{grid-column:1/-1;border-left:0;border-top:1px solid var(--line2);max-height:42vh}
+  .cf-todo-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+}
 @media (max-width:980px){
-  .craft{grid-template-columns:260px 1fr}
+  .craft,.craft[data-todo="1"]{grid-template-columns:260px minmax(0,1fr)}
   .cf-detail{padding:18px 16px 40px}
 }
 @media (max-width:760px){
-  .craft{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .craft,.craft[data-todo="1"]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .cf-todo-body{grid-template-columns:1fr}
   .cf-todo{max-height:52vh}
   .craft[data-sel="1"] .cf-list{display:none}
@@ -235,15 +241,15 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 }
 
 /* 할 일(제작 목록) */
-.cf-todo{grid-column:1/-1;border-top:1px solid var(--line2);background:var(--panel);max-height:44vh;overflow-y:auto}
+.cf-todo{border-left:1px solid var(--line2);background:var(--panel);overflow-y:auto;min-height:0}
 .cf-todo-hd{position:sticky;top:0;z-index:1;background:var(--panel);display:flex;align-items:center;gap:9px;padding:9px 16px;border-bottom:1px solid var(--line)}
 .cf-todo-hd h3{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember)}
 .cf-todo-hd .sp{flex:1}
 .cf-todo-hd em{font-style:normal;color:var(--dim);font-size:11.5px}
 .cf-todo-hd button{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:var(--muted)}
 .cf-todo-hd button:hover{color:var(--ink);border-color:var(--muted)}
-.cf-todo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;padding:12px 16px 16px}
-.cf-todo-col h4{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.cf-todo-body{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:12px 15px 18px}
+.cf-todo-col h4{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);opacity:.75}
 .cf-job{display:flex;align-items:center;gap:8px;padding:4px 5px;border-radius:6px;min-width:0}
 .cf-job:hover{background:var(--panel2)}
 .cf-job img,.cf-job .ph{width:24px;height:24px;flex:none;border-radius:4px;background:#0d0f13;border:1px solid var(--line);object-fit:contain}
@@ -268,6 +274,14 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .cf-add{background:var(--ember);border:0;color:#1a1207;border-radius:7px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;margin-left:auto;flex:none}
 .cf-add:hover{filter:brightness(1.08)}
 .cf-add[data-in="1"]{background:var(--panel2);color:var(--muted);border:1px solid var(--line2)}
+
+/* 아래 막대로 돌아갈 때는 두 칸을 나란히 — 위 미디어쿼리보다 뒤에 와야 먹는다 */
+@media (max-width:1200px){
+  .cf-todo-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+}
+@media (max-width:760px){
+  .cf-todo-body{grid-template-columns:minmax(0,1fr)}
+}
 .cf-back{display:none;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:6px 11px;cursor:pointer;font-size:12.5px;align-self:flex-start}
 
 
@@ -819,6 +833,7 @@ function renderTodo(){
   const box = $('cfTodo');
   box.textContent = '';
   box.hidden = !todo.size;
+  $('craft').dataset.todo = todo.size ? '1' : '0';
   if (!todo.size) return;
 
   const totals = todoTotals();

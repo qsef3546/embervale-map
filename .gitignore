@@ -1,0 +1,2 @@
+# 위키에서 받은 레시피 캐시 — 없으면 build_recipes.py 가 다시 받는다
+tools/cache-ingredients.json

@@ -32,8 +32,8 @@ a{color:var(--shroud)}
 .brand{text-align:center;padding-top:4px}
 .brand h1{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.06em;margin:0;line-height:1.1}
 .brand p{margin:6px 0 0;color:var(--ember);font-size:11px;letter-spacing:.24em;text-transform:uppercase}
-.tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line2);border-radius:7px;overflow:hidden}
-.tabs a{text-align:center;padding:8px 0;text-decoration:none;color:var(--muted);font-size:13px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line2);border-radius:7px;overflow:hidden}
+.tabs a{text-align:center;padding:8px 2px;text-decoration:none;color:var(--muted);font-size:12.5px}
 .tabs a[aria-current="page"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--ember)}
 .sec-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
 .sec-title button{background:none;border:0;color:var(--dim);font-size:11px;letter-spacing:.04em;cursor:pointer;padding:2px 4px;text-transform:none}
@@ -145,6 +145,84 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .item .go:hover{color:var(--ink);background:var(--panel)}
 .list .sec{font-size:11px;letter-spacing:.16em;color:var(--ember);text-transform:uppercase;margin:10px 0 -4px}
 
+
+/* 제작 */
+.craft{position:absolute;inset:0;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:320px 1fr}
+.cf-list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.cf-top{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
+.cf-chips{display:flex;flex-wrap:wrap;gap:5px}
+.cf-chip{padding:4px 9px;border:1px solid var(--line2);border-radius:999px;background:var(--panel);color:var(--muted);cursor:pointer;font-size:11.5px;white-space:nowrap}
+.cf-chip:hover{color:var(--ink)}
+.cf-chip[aria-pressed="true"]{background:var(--ember);border-color:var(--ember);color:#1a1207;font-weight:600}
+.cf-count{font-size:11.5px;color:var(--dim);padding:0 14px 6px}
+.cf-scroll{flex:1;overflow-y:auto;padding:0 8px 16px}
+.cf-row{width:100%;display:flex;gap:9px;align-items:center;background:none;border:0;padding:6px 7px;border-radius:6px;cursor:pointer;text-align:left;min-width:0}
+.cf-row:hover{background:var(--panel2)}
+.cf-row[aria-current="true"]{background:var(--panel2);box-shadow:inset 2px 0 0 var(--ember)}
+.cf-ic{width:30px;height:30px;flex:none;border-radius:6px;background:#0d0f13;border:1px solid var(--line);object-fit:contain}
+.cf-ic.ph{display:grid;place-items:center;color:var(--dim);font-size:13px}
+.cf-nm{min-width:0;flex:1;display:flex;flex-direction:column}
+.cf-nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.cf-nm small{color:var(--dim);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.cf-detail{overflow-y:auto;padding:22px 26px 48px;min-width:0}
+.cf-detail .in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.cf-hero{display:flex;gap:14px;align-items:flex-start}
+.cf-hero .cf-ic{width:60px;height:60px;border-radius:9px}
+.cf-hero h2{font-family:var(--display);font-size:24px;margin:0;line-height:1.25}
+.cf-hero .en{color:var(--dim);font-size:12.5px;margin-top:2px}
+.cf-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.cf-tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--muted)}
+.cf-tag.r-Uncommon{color:#5fbf7a;border-color:#2f5c3c}
+.cf-tag.r-Rare{color:#5aa6e0;border-color:#2b4a63}
+.cf-tag.r-Epic{color:#a98ae0;border-color:#4a3b6b}
+.cf-tag.r-Legendary{color:#e0a648;border-color:#6b5320}
+.cf-tag.r-Collectible{color:#e07ab0;border-color:#6b3050}
+.cf-desc{margin:0;font-size:13px;line-height:1.7;color:#c9ccd4}
+.cf-block{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:13px 15px 15px}
+.cf-block>h3{margin:0 0 9px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.cf-block>h3 em{font-style:normal;color:var(--dim);letter-spacing:0;text-transform:none;font-size:11.5px}
+.cf-none{color:var(--dim);font-size:12.5px;margin:0}
+.cf-src{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#c2c6d0;margin:0;padding:0;list-style:none}
+.cf-src li{display:flex;gap:7px}
+.cf-src b{color:var(--muted);font-weight:500;flex:none;min-width:44px}
+
+/* 레시피 트리 */
+.cf-tree{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.cf-tree .cf-tree{margin-left:14px;padding-left:12px;border-left:1px solid var(--line2);margin-top:2px}
+.cf-node{display:flex;align-items:center;gap:7px;padding:3px 4px;border-radius:5px;min-width:0}
+.cf-node:hover{background:var(--panel2)}
+.cf-tw{width:18px;height:18px;flex:none;background:none;border:0;color:var(--dim);cursor:pointer;border-radius:4px;display:grid;place-items:center;font-size:10px;line-height:1}
+.cf-tw:hover{color:var(--ink);background:var(--panel)}
+.cf-tw[disabled]{opacity:0;cursor:default}
+.cf-node img,.cf-node .ph{width:22px;height:22px;flex:none;border-radius:4px;background:#0d0f13;border:1px solid var(--line);object-fit:contain}
+.cf-node .ph{display:grid;place-items:center;color:var(--dim);font-size:10px}
+.cf-link{background:none;border:0;color:var(--ink);cursor:pointer;padding:0;font-size:13px;text-align:left;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-link:hover{color:var(--ember);text-decoration:underline}
+.cf-qty{font-size:12px;color:var(--ember);font-variant-numeric:tabular-nums;flex:none}
+.cf-where{font-size:11px;color:var(--dim);flex:none;margin-left:auto;padding-left:8px;white-space:nowrap}
+.cf-raw{font-size:11px;color:var(--dim);flex:none}
+.cf-alt{font-size:11.5px;color:var(--dim);margin:8px 0 3px}
+.cf-more{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:5px 4px;text-align:left}
+.cf-more:hover{color:var(--ember)}
+.cf-empty{color:var(--dim);font-size:13px;display:grid;place-items:center;height:100%;text-align:center;padding:24px}
+
+@media (max-width:980px){
+  .craft{grid-template-columns:260px 1fr}
+  .cf-detail{padding:18px 16px 40px}
+}
+@media (max-width:760px){
+  .craft{grid-template-columns:1fr;grid-template-rows:auto}
+  .craft[data-sel="1"] .cf-list{display:none}
+  .craft:not([data-sel="1"]) .cf-detail{display:none}
+  .cf-list{border-right:0}
+  .cf-back{display:inline-flex!important}
+  .craft{padding-top:52px}
+}
+.cf-back{display:none;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:6px 11px;cursor:pointer;font-size:12.5px;align-self:flex-start}
+
+body[data-view="craft"] .map-only{display:none}
+
 @media (max-width:980px){ .tracker{display:none} }
 @media (max-width:760px){
   .app{grid-template-columns:1fr}
@@ -169,19 +247,20 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
       </div>
       <nav class="tabs">
         <a href="#map" id="tabMap">지도</a>
-        <a href="#checklist" id="tabList">100% 체크리스트</a>
+        <a href="#checklist" id="tabList">체크리스트</a>
+        <a href="#craft" id="tabCraft">제작</a>
       </nav>
-      <div>
+      <div class="map-only">
         <div class="search"><input id="q" type="search" placeholder="장소·수집품 검색 (한글/영문)" aria-label="검색" autocomplete="off"></div>
         <ul class="results" id="results" hidden></ul>
       </div>
-      <div class="row">
+      <div class="row map-only">
         <button class="btn" id="showAll">모두 표시</button>
         <button class="btn" id="hideAll">모두 숨김</button>
       </div>
-      <div id="sections"></div>
-      <label class="check"><input type="checkbox" id="hideFound"> 찾은 항목 지도에서 숨기기</label>
-      <label class="check"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
+      <div id="sections" class="map-only"></div>
+      <label class="check map-only"><input type="checkbox" id="hideFound"> 찾은 항목 지도에서 숨기기</label>
+      <label class="check map-only"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
       <div class="note">
         비공식 팬 제작 지도이며 Keen Games와 관련이 없습니다.
         마커 좌표·이름·설명은 <a href="https://enshrouded.wiki.gg/wiki/Map" target="_blank" rel="noopener">The Official Enshrouded Wiki</a> 기여자들의 데이터를 한국어로 옮긴 것으로,
@@ -212,11 +291,23 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
       <div class="pop" id="pop" hidden></div>
     </div>
     <div class="list" id="list" hidden><div class="list-in" id="listIn"></div></div>
+    <div class="craft" id="craft" hidden data-sel="0">
+      <div class="cf-list">
+        <div class="cf-top">
+          <div class="search"><input id="cfQuery" type="search" placeholder="아이템 검색 (한글/영문)" aria-label="아이템 검색" autocomplete="off"></div>
+          <div class="cf-chips" id="cfChips"></div>
+        </div>
+        <div class="cf-count" id="cfCount"></div>
+        <div class="cf-scroll" id="cfScroll"></div>
+      </div>
+      <div class="cf-detail" id="cfDetail"></div>
+    </div>
     <button class="side-toggle" id="sideToggle" aria-controls="side" aria-expanded="false">☰ 메뉴</button>
   </main>
 </div>
 
 <script src="data.js"></script>
+<script src="recipes.js"></script>
 <script>
 (() => {
 const D = window.EMB;
@@ -458,7 +549,7 @@ function openMarker(m){
 }
 function goTo(m){
   if (hidden.has(m.g)){ hidden.delete(m.g); saveHidden(); renderPins(); renderSide(); }
-  if (location.hash === '#checklist') location.hash = '#map';
+  if (location.hash && location.hash !== '#map') location.hash = '#map';
   const [wx, wy] = toW(m); flyTo(wx, wy, Math.max(view.s, fitS*5));
   setTimeout(() => openMarker(m), reduce ? 0 : 470); closeSide();
 }
@@ -559,13 +650,232 @@ function renderList(){
   $('list').scrollTop = sc;
 }
 
+
+/* ───────── 제작 ───────── */
+const C = window.EMBC, CI = C.items, CR = C.recipes;
+const madeBy = CI.map(() => []), usedIn = CI.map(() => []);
+for (const r of CR){
+  madeBy[r.o].push(r);
+  for (const [ii] of r.i) if (!usedIn[ii].includes(r)) usedIn[ii].push(r);
+}
+const cName = it => it.k || it.n;
+const cShops = r => [...(r.w || []).map(i => C.shops[i]), ...(r.c != null ? [C.crafters[r.c]] : [])]
+  .filter((v, i, a) => v && a.indexOf(v) === i);
+
+/* 아이콘(icons.js)은 700KB가 넘어 제작 탭을 처음 열 때만 받는다. */
+let iconsLoad = null;
+function loadIcons(){
+  if (!iconsLoad) iconsLoad = new Promise(res => {
+    const s = document.createElement('script');
+    s.src = 'icons.js'; s.async = true;
+    s.onload = s.onerror = () => res(window.EMBI ||= {});
+    document.head.append(s);
+  }).then(() => { if (!$('craft').hidden) renderCraft(); });
+  return iconsLoad;
+}
+function cIcon(it, cls){
+  const b = window.EMBI?.[it.n];
+  if (b){
+    const g = el('img', { className:cls, alt:'', loading:'lazy' });
+    g.src = 'data:image/webp;base64,' + b;
+    return g;
+  }
+  return el('div', { className:cls + ' ph' }, cName(it).slice(0, 1));
+}
+
+let cQuery = '', cCat = -1, cSel = -1, cShown = 200;
+const cExpanded = new Set();          // "방향:경로" 로 펼침 상태를 기억한다
+
+function cMatch(it){
+  if (cCat >= 0 && it.c !== cCat) return false;
+  if (!cQuery) return true;
+  return (it.n + ' ' + (it.k || '')).toLowerCase().includes(cQuery);
+}
+
+function renderCraftList(){
+  const box = $('cfScroll'); box.textContent = '';
+  const hits = [];
+  for (let i = 0; i < CI.length; i++) if (cMatch(CI[i])) hits.push(i);
+  hits.sort((a, b) => cName(CI[a]).localeCompare(cName(CI[b]), 'ko'));
+  $('cfCount').textContent = `${hits.length.toLocaleString('ko')}종`
+    + (hits.length > cShown ? ` 중 ${cShown}종 표시` : '');
+  if (!hits.length){ box.append(el('p', { className:'cf-none' }, '일치하는 아이템이 없어요')); return; }
+  for (const i of hits.slice(0, cShown)){
+    const it = CI[i], b = el('button', { className:'cf-row' });
+    if (i === cSel) b.setAttribute('aria-current', 'true');
+    const nm = el('div', { className:'cf-nm' });
+    nm.append(el('span', {}, cName(it)), el('small', {}, it.k ? it.n : C.cats[it.c]));
+    b.append(cIcon(it, 'cf-ic'), nm);
+    b.onclick = () => selectCraft(i);
+    box.append(b);
+  }
+  if (hits.length > cShown){
+    const more = el('button', { className:'cf-more' }, `+ ${hits.length - cShown}종 더 보기`);
+    more.onclick = () => { cShown += 400; renderCraftList(); };
+    box.append(more);
+  }
+}
+
+/* 트리 한 줄. dir='down' 은 재료 쪽, dir='up' 은 이걸 쓰는 쪽으로 내려간다. */
+function cTreeNode(idx, qty, dir, path, depth, where){
+  const it = CI[idx], li = el('li'), node = el('div', { className:'cf-node' });
+  const loop = path.includes(idx);
+  const kids = loop || depth >= 6 ? []
+    : dir === 'down' ? (madeBy[idx][0]?.i || [])
+    : [...new Set(usedIn[idx].map(r => r.o))].map(o => [o, 0]);
+  const key = dir + ':' + path.concat(idx).join('>');
+  const open = cExpanded.has(key);
+
+  const tw = el('button', { className:'cf-tw', ariaLabel:open ? '접기' : '펼치기' }, kids.length ? (open ? '▼' : '▶') : '');
+  if (!kids.length) tw.disabled = true;
+  const link = el('button', { className:'cf-link', title:it.k ? it.n : '' }, cName(it));
+  link.onclick = () => selectCraft(idx);
+  node.append(tw, cIcon(it, ''), link);
+  if (qty) node.append(el('span', { className:'cf-qty' }, '×' + qty));
+  if (where) node.append(el('span', { className:'cf-where' }, where));
+  else if (dir === 'down' && !madeBy[idx].length) node.append(el('span', { className:'cf-raw' }, '원자재'));
+  li.append(node);
+
+  if (open && kids.length){
+    const sub = el('ul', { className:'cf-tree' });
+    for (const [ci, cq] of kids)
+      sub.append(cTreeNode(ci, cq, dir, path.concat(idx), depth + 1,
+        dir === 'up' ? (cShops(usedIn[idx].find(r => r.o === ci))[0] || '') : ''));
+    li.append(sub);
+  }
+  tw.onclick = () => { open ? cExpanded.delete(key) : cExpanded.add(key); renderCraftDetail(); };
+  return li;
+}
+
+function cBlock(title, note){
+  const d = el('div', { className:'cf-block' }), h = el('h3', {}, title);
+  if (note) h.append(el('em', {}, note));
+  d.append(h);
+  return d;
+}
+
+function renderCraftDetail(){
+  const box = $('cfDetail'); box.textContent = '';
+  if (cSel < 0){
+    box.append(el('p', { className:'cf-empty' }, '왼쪽에서 아이템을 고르면 만드는 법과, 그 아이템으로 만들 수 있는 것을 보여 줍니다.'));
+    return;
+  }
+  const it = CI[cSel], inr = el('div', { className:'in' });
+
+  const back = el('button', { className:'cf-back' }, '← 목록');
+  back.onclick = () => { $('craft').dataset.sel = '0'; };
+  inr.append(back);
+
+  const hero = el('div', { className:'cf-hero' }), txt = el('div', { style:'min-width:0' });
+  txt.append(el('h2', {}, cName(it)));
+  if (it.k) txt.append(el('div', { className:'en' }, it.n));
+  const tags = el('div', { className:'cf-tags' });
+  tags.append(el('span', { className:'cf-tag' }, C.cats[it.c]));
+  if (it.r) tags.append(el('span', { className:'cf-tag r-' + it.r }, it.r));
+  if (it.l) tags.append(el('span', { className:'cf-tag' }, 'Lv ' + it.l));
+  for (const t of it.t || []) tags.append(el('span', { className:'cf-tag' }, C.types[t]));
+  txt.append(tags);
+  hero.append(cIcon(it, 'cf-ic'), txt);
+  inr.append(hero);
+  if (it.d) inr.append(el('p', { className:'cf-desc' }, it.d));
+
+  /* 어디서 얻나 — 도감이 있는 아이템만 */
+  if (it.b?.length || it.w?.length || it.dr?.length || it.m?.length){
+    const b = cBlock('획득'), ul = el('ul', { className:'cf-src' });
+    const add = (k, v) => { const li = el('li'); li.append(el('b', {}, k), el('span', {}, v)); ul.append(li); };
+    if (it.b?.length) add('지역', it.b.map(i => C.biomes[i]).join(', '));
+    for (const w of it.w || []) add('세계', w);
+    for (const d of it.dr || []) add('드롭', d);
+    if (it.m?.length) add('처치', it.m.join(', '));
+    b.append(ul); inr.append(b);
+  }
+
+  /* 만드는 법 */
+  const recs = madeBy[cSel];
+  const mk = cBlock('만드는 법', recs.length > 1 ? `레시피 ${recs.length}가지` : '');
+  if (!recs.length) mk.append(el('p', { className:'cf-none' }, '제작할 수 없는 원자재입니다. 세계에서 직접 구해야 합니다.'));
+  for (const [n, r] of recs.entries()){
+    const shops = cShops(r);
+    if (recs.length > 1) mk.append(el('p', { className:'cf-alt' }, `${n + 1}. ${shops.join(' · ') || '제작'}`));
+    else if (shops.length) mk.append(el('p', { className:'cf-alt' }, shops.join(' · ') + (r.q > 1 ? ` · 1회 ${r.q}개` : '')));
+    const ul = el('ul', { className:'cf-tree' });
+    for (const [ci, cq] of r.i) ul.append(cTreeNode(ci, cq, 'down', [cSel], 1, ''));
+    mk.append(ul);
+  }
+  inr.append(mk);
+
+  /* ★ 이걸로 만들 수 있는 것 */
+  const outs = [...new Set(usedIn[cSel].map(r => r.o))]
+    .sort((a, b) => CI[a].c - CI[b].c || cName(CI[a]).localeCompare(cName(CI[b]), 'ko'));
+  const use = cBlock('이걸로 만들 수 있는 것', outs.length ? `${outs.length}종` : '');
+  if (!outs.length) use.append(el('p', { className:'cf-none' }, '다른 아이템의 재료로 쓰이지 않습니다.'));
+  else {
+    const ul = el('ul', { className:'cf-tree' });
+    const cap = Math.min(outs.length, 60);
+    for (const o of outs.slice(0, cap)){
+      const r = usedIn[cSel].find(x => x.o === o);
+      const need = r.i.find(([i]) => i === cSel)?.[1];
+      ul.append(cTreeNode(o, 0, 'up', [cSel], 1,
+        [need ? `${cName(CI[cSel])} ${need}개` : '', cShops(r)[0]].filter(Boolean).join(' · ')));
+    }
+    use.append(ul);
+    if (outs.length > cap) use.append(el('p', { className:'cf-none' }, `외 ${outs.length - cap}종`));
+  }
+  inr.append(use);
+  box.append(inr);
+  box.scrollTop = 0;
+}
+
+function renderCraft(){ renderCraftList(); renderCraftDetail(); }
+
+function selectCraft(i){
+  cSel = i;
+  $('craft').dataset.sel = '1';
+  const h = '#craft=' + encodeURIComponent(CI[i].n);
+  if (location.hash !== h){ craftHashLock = true; location.hash = h; }
+  renderCraft();
+}
+let craftHashLock = false;
+const cByName = new Map(CI.map((it, i) => [it.n, i]));
+
+$('cfQuery').addEventListener('input', e => {
+  cQuery = e.target.value.trim().toLowerCase(); cShown = 200; renderCraftList();
+});
+{
+  const bar = $('cfChips');
+  const mk = (label, cat) => {
+    const b = el('button', { className:'cf-chip' }, label);
+    b.setAttribute('aria-pressed', String(cCat === cat));
+    b.onclick = () => {
+      cCat = cCat === cat ? -1 : cat; cShown = 200;
+      [...bar.children].forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.cat === cCat)));
+      renderCraftList();
+    };
+    b.dataset.cat = cat;
+    return b;
+  };
+  C.cats.forEach((c, i) => bar.append(mk(c, i)));
+}
+
 /* ───────── 라우팅 ───────── */
 function route(){
-  const isList = location.hash === '#checklist';
-  $('list').hidden = !isList; mapEl.hidden = isList;
-  $('tabMap').removeAttribute('aria-current'); $('tabList').removeAttribute('aria-current');
-  (isList ? $('tabList') : $('tabMap')).setAttribute('aria-current', 'page');
-  if (isList) renderList(); else { laidOutS = -1; apply(); }
+  const h = location.hash;
+  const isList = h === '#checklist', isCraft = h === '#craft' || h.startsWith('#craft=');
+  $('list').hidden = !isList; $('craft').hidden = !isCraft; mapEl.hidden = isList || isCraft;
+  document.body.dataset.view = isCraft ? 'craft' : isList ? 'checklist' : 'map';
+  for (const id of ['tabMap', 'tabList', 'tabCraft']) $(id).removeAttribute('aria-current');
+  (isCraft ? $('tabCraft') : isList ? $('tabList') : $('tabMap')).setAttribute('aria-current', 'page');
+  if (isList) renderList();
+  else if (isCraft){
+    loadIcons();
+    if (!craftHashLock){
+      const nm = h.startsWith('#craft=') ? decodeURIComponent(h.slice(7)) : null;
+      cSel = nm != null && cByName.has(nm) ? cByName.get(nm) : -1;
+      $('craft').dataset.sel = cSel >= 0 ? '1' : '0';
+    }
+    craftHashLock = false;
+    renderCraft();
+  } else { laidOutS = -1; apply(); }
   closeSide();
 }
 addEventListener('hashchange', route);

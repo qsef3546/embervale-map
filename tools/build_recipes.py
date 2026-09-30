@@ -110,13 +110,19 @@ def group_recipes(rows):
     return grouped
 
 
+def load_desc_ko():
+    """영문 설명 → 한글 설명. 같은 문장을 여러 아이템이 공유한다."""
+    path = os.path.join(HERE, "desc.ko.json")
+    return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+
+
 def load_stats():
     """위키에서 받아 둔 설명·옵션. 없으면 조용히 건너뛴다."""
     path = os.path.join(HERE, "cache-stats.json")
     return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 
 
-def build_items(names, crafted, shops, dg, manual, wiki):
+def build_items(names, crafted, shops, dg, manual, wiki, desc_ko):
     biomes, types = [], []
     items = []
     for n in names:
@@ -136,7 +142,7 @@ def build_items(names, crafted, shops, dg, manual, wiki):
             if e.get("l"):
                 it["l"] = int(e["l"])
             if e.get("d"):
-                it["d"] = e["d"]
+                it["d"] = desc_ko.get(e["d"], e["d"])
             eb = [BIOME_KO.get(b, b) for b in e.get("b") or []]
             for b in eb:
                 if b not in biomes:
@@ -160,7 +166,7 @@ def build_items(names, crafted, shops, dg, manual, wiki):
 
         w = wiki.get(n) or {}
         if not it.get("d") and w.get("description"):
-            it["d"] = w["description"]
+            it["d"] = desc_ko.get(w["description"], w["description"])
         if w.get("Type"):
             it["ty"] = stats_ko.TYPE_KO.get(w["Type"], w["Type"])
         if not it.get("r") and w.get("Rarity"):
@@ -222,7 +228,9 @@ def main():
 
     wiki = load_stats()
     print("위키 설명·옵션 %d" % sum(1 for v in wiki.values() if v))
-    items, biomes, types = build_items(names, crafted, shops, dg, manual, wiki)
+    desc_ko = load_desc_ko()
+    print("설명 한글 사전 %d" % len(desc_ko))
+    items, biomes, types = build_items(names, crafted, shops, dg, manual, wiki, desc_ko)
 
     recipes = []
     for (item, crafter, w1, w2), g in grouped.items():

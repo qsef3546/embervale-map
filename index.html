@@ -32,6 +32,35 @@ a{color:var(--shroud)}
 .brand h1{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.06em;margin:0;line-height:1.1}
 .brand p{margin:6px 0 0;color:var(--ember);font-size:11px;letter-spacing:.24em;text-transform:uppercase}
 
+
+/* 사용법 */
+.help-btn{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:5px 11px;cursor:pointer;font-size:12.5px;color:var(--muted);flex:none;display:flex;align-items:center;gap:5px}
+.help-btn:hover{color:var(--ink);border-color:var(--muted)}
+.help-btn b{font-weight:600;font-size:12px;opacity:.8}
+.help{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:22px}
+.help-bg{position:absolute;inset:0;background:rgba(0,0,0,.58)}
+.help-box{position:relative;background:var(--panel);border:1px solid var(--line2);border-radius:12px;width:min(700px,100%);max-height:min(80vh,780px);display:flex;flex-direction:column;box-shadow:0 22px 60px rgba(0,0,0,.6)}
+.help-hd{border-bottom:1px solid var(--line);padding:15px 20px 12px;display:flex;align-items:baseline;gap:10px;flex:none}
+.help-hd h2{font-family:var(--display);font-size:20px;font-weight:800;margin:0}
+.help-hd .sub{color:var(--ember);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
+.help-hd .x{margin-left:auto;align-self:center;background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;width:28px;height:28px;border-radius:6px}
+.help-hd .x:hover{background:var(--panel2);color:var(--ink)}
+.help-pick{display:flex;gap:4px;padding:11px 20px 0;flex:none}
+.help-pick button{background:none;border:1px solid var(--line2);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:12px;color:var(--muted)}
+.help-pick button:hover{color:var(--ink)}
+.help-pick button[aria-pressed="true"]{background:var(--ember);border-color:var(--ember);color:#1a1207;font-weight:600}
+.help-body{padding:16px 20px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:17px}
+.help-sec h3{margin:0 0 7px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ember)}
+.help-sec ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:6px}
+.help-sec li{font-size:13px;line-height:1.7;color:#c5c9d2}
+.help-sec li b{color:var(--ink);font-weight:600}
+.help-sec kbd{background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:0 5px;font:inherit;font-size:11.5px;color:var(--ink)}
+@media (max-width:760px){
+  .help{padding:12px}
+  .help-btn span{display:none}
+  .help-body{padding:14px 16px 20px}
+}
+
 /* 상단바 · 푸터 */
 .shell{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%}
 .topbar{display:flex;align-items:baseline;gap:18px;padding:9px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -315,6 +344,7 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
       <a href="#checklist" id="tabList">체크리스트</a>
       <a href="#craft" id="tabCraft">제작</a>
     </nav>
+    <button class="help-btn" id="helpBtn" aria-haspopup="dialog"><b>?</b> <span>사용법</span></button>
   </header>
 
   <div class="app">
@@ -379,6 +409,19 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
         배경 지형은 마커 분포로 추정해 새로 그린 개략도입니다. 찾음 표시는 이 브라우저에만 저장됩니다.
     </p>
   </footer>
+</div>
+
+<div class="help" id="help" hidden role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help-bg" id="helpBg"></div>
+  <div class="help-box">
+    <div class="help-hd">
+      <h2 id="helpTitle">지도</h2>
+      <span class="sub">사용법</span>
+      <button class="x" id="helpClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="help-pick" id="helpPick"></div>
+    <div class="help-body" id="helpBody"></div>
+  </div>
 </div>
 
 <script src="data.js"></script>
@@ -689,7 +732,7 @@ const side = $('side'), sideToggle = $('sideToggle'); let scrim = null;
 function openSide(){ side.classList.add('open'); sideToggle.setAttribute('aria-expanded', 'true'); scrim = el('div', { className:'scrim' }); scrim.onclick = closeSide; document.body.append(scrim); }
 function closeSide(){ side.classList.remove('open'); sideToggle.setAttribute('aria-expanded', 'false'); scrim?.remove(); scrim = null; }
 sideToggle.onclick = openSide;
-addEventListener('keydown', e => { if (e.key === 'Escape'){ closePop(); closeSide(); } });
+addEventListener('keydown', e => { if (e.key === 'Escape'){ closeHelp(); closePop(); closeSide(); } });
 
 /* ───────── 체크리스트 ───────── */
 const openGroups = new Set(store.get('emb2.open', []));
@@ -1050,6 +1093,104 @@ $('cfQuery').addEventListener('input', e => {
   };
   C.cats.forEach((c, i) => bar.append(mk(c, i)));
 }
+
+
+/* ───────── 사용법 ───────── */
+const HELP = {
+  map: ['지도', [
+    ['무엇을 보여 주나', [
+      '주요 장소·거점·수집품·기록 <b>42종, 마커 1,018개</b>를 한국어 이름과 설명으로 표시합니다.',
+      '배경 지형은 마커 분포로 추정해 새로 그린 개략도라 실제 지형과 다를 수 있습니다.',
+    ]],
+    ['찾아보기', [
+      '왼쪽 <b>검색</b>에 한글이나 영문을 넣으면 장소·수집품을 찾아 줍니다. 결과를 누르면 그 위치로 날아갑니다.',
+      '왼쪽 목록에서 종류를 눌러 <b>표시/숨김</b>을 바꿉니다. <b>모두 표시</b>·<b>모두 숨김</b>으로 한 번에 바꿀 수도 있습니다.',
+      '숫자는 그 종류의 마커 수입니다.',
+    ]],
+    ['찾음 표시', [
+      '마커를 누르면 이름·설명·좌표가 나오고 <b>찾음</b>에 체크할 수 있습니다.',
+      '오른쪽 <b>진행 상황</b> 패널에 종류별 진행도가 쌓입니다. 오른쪽 위 ☰ 버튼으로 여닫습니다.',
+      '<b>찾은 항목 지도에서 숨기기</b>를 켜면 남은 것만 보입니다.',
+      '체크는 이 브라우저에만 저장됩니다. 다른 기기나 시크릿 창에서는 보이지 않습니다.',
+    ]],
+    ['지도 조작', [
+      '드래그로 이동, 휠·두 손가락·<kbd>＋</kbd><kbd>－</kbd> 버튼으로 확대·축소합니다.',
+      '<kbd>⛶</kbd> 를 누르면 전체가 한눈에 들어오게 맞춥니다.',
+      '왼쪽 아래에 마우스 위치의 좌표가 나옵니다.',
+    ]],
+  ]],
+  checklist: ['체크리스트', [
+    ['무엇을 하는 화면인가', [
+      '수집품과 기록을 종류별로 묶어 <b>100% 달성</b>을 추적합니다.',
+      '맨 위 막대가 전체 진행도이고, 종류마다 <b>찾은 수 / 전체</b>가 붙습니다.',
+    ]],
+    ['쓰는 법', [
+      '종류를 눌러 펼치고 항목에 체크합니다. <b>지도의 찾음 표시와 같은 기록</b>이라 한쪽에서 체크하면 양쪽에 반영됩니다.',
+      '이름 옆 <b>➜</b> 를 누르면 지도로 넘어가 그 위치를 비춰 줍니다.',
+      '펼쳐 둔 종류는 다음에 들어와도 그대로 열려 있습니다.',
+    ]],
+  ]],
+  craft: ['제작', [
+    ['왼쪽 — 아이템 찾기', [
+      '<b>아이템 1,987종</b>을 한글·영문으로 검색합니다.',
+      '분류 칩(장식·건축 / 요리·음료 / 물약·연금 / 장비·무기 / 농사·씨앗 / 기타 / 원자재)으로 걸러 봅니다. 한 번 더 누르면 해제됩니다.',
+    ]],
+    ['가운데 — 만드는 법과 쓰임', [
+      '<b>만드는 법</b>에는 재료와 수량, 작업대가 나옵니다. 레시피가 여러 가지면 모두 보여 줍니다.',
+      '<b>이걸로 만들 수 있는 것</b>이 이 화면의 핵심입니다. 고른 재료를 쓰는 제작품을 전부, <b>필요한 개수와 작업대까지</b> 보여 줍니다.',
+      '줄 앞의 <b>▶</b> 를 누르면 계속 펼쳐 상위·하위 재료를 <b>6단계</b>까지 따라갈 수 있습니다.',
+      '재료 오른쪽에 <b>어디서 구하는지</b>가 붙습니다. 만들 수 있으면 작업대, 아니면 지역과 채집 방식입니다. 마우스를 올리면 더 자세한 획득 설명과 드롭 몬스터가 나옵니다.',
+      '이름을 누르면 그 아이템으로 넘어갑니다.',
+    ]],
+    ['오른쪽 — 할 일', [
+      '<b>+ 할 일에 추가</b> 로 담아 두면 지울 때까지 남습니다. 여러 종류를 같이 담을 수 있습니다.',
+      '<b>필요한 재료 총합</b>이 담은 것 전부를 합산해 나옵니다. 칩을 누르면 그 재료로 넘어갑니다.',
+      '수량은 <b>제작 횟수</b>입니다. 1회에 10개가 나오는 레시피라면 <kbd>+</kbd> 한 번이 10개씩 늘고 재료도 한 벌씩 늘어납니다.',
+      '화면이 좁으면(1200px 미만) 할 일이 화면 아래 막대로 내려갑니다.',
+      '담아 둔 목록은 이 브라우저에만 저장됩니다.',
+    ]],
+    ['그 밖에', [
+      '고른 아이템이 주소에 남습니다(<kbd>#craft=Leather</kbd>). 링크로 공유할 수 있습니다.',
+      '아이콘은 1,987종 중 1,955종에 있습니다. 없는 것은 첫 글자로 대신합니다.',
+    ]],
+  ]],
+};
+let helpView = null;
+function openHelp(v){
+  helpView = v || document.body.dataset.view || 'map';
+  renderHelp();
+  $('help').hidden = false;
+  $('helpClose').focus();
+}
+function closeHelp(){ $('help').hidden = true; }
+function renderHelp(){
+  const [title, secs] = HELP[helpView] || HELP.map;
+  const box = $('helpBody');
+  box.textContent = '';
+  for (const [head, lines] of secs){
+    const s = el('div', { className:'help-sec' });
+    s.append(el('h3', {}, head));
+    const ul = el('ul');
+    for (const t of lines){ const li = el('li'); li.innerHTML = t; ul.append(li); }
+    s.append(ul);
+    box.append(s);
+  }
+  $('helpTitle').textContent = title;
+  for (const b of $('helpPick').children)
+    b.setAttribute('aria-pressed', String(b.dataset.v === helpView));
+}
+{
+  const pick = $('helpPick');
+  for (const [v, [label]] of Object.entries(HELP)){
+    const b = el('button', {}, label);
+    b.dataset.v = v;
+    b.onclick = () => { helpView = v; renderHelp(); };
+    pick.append(b);
+  }
+}
+$('helpBtn').onclick = () => openHelp();
+$('helpClose').onclick = closeHelp;
+$('helpBg').onclick = closeHelp;
 
 /* ───────── 라우팅 ───────── */
 function route(){

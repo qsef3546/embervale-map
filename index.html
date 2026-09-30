@@ -756,9 +756,21 @@ function renderCraftList(){
 
 
 /* ───────── 할 일(제작 목록) ───────── */
-const todo = new Map(Object.entries(store.get('emb2.todo', {})));
+/* 담은 수는 '제작 횟수'다. 1회에 여러 개 나오는 레시피에서도
+   +/− 한 번이 늘 재료 한 벌씩 움직이게 하려고 이렇게 센다. */
+function loadTodo(){
+  const cur = store.get('emb2.todo2', null);
+  if (cur) return cur;
+  const old = store.get('emb2.todo', {}), out = {};   // 예전엔 만들 개수를 담았다
+  for (const [n, q] of Object.entries(old)){
+    const i = CI.findIndex(x => x.n === n), r = i < 0 ? null : madeBy[i][0];
+    out[n] = Math.max(1, Math.ceil(q / (r?.q || 1)));
+  }
+  return out;
+}
+const todo = new Map(Object.entries(loadTodo()));
 let todoOpen = store.get('emb2.todoOpen', true);
-function saveTodo(){ store.set('emb2.todo', Object.fromEntries(todo)); }
+function saveTodo(){ store.set('emb2.todo2', Object.fromEntries(todo)); }
 function todoBump(name, d){
   const q = (todo.get(name) || 0) + d;
   if (q > 0) todo.set(name, q); else todo.delete(name);
@@ -766,16 +778,14 @@ function todoBump(name, d){
 }
 function todoDrop(name){ todo.delete(name); saveTodo(); renderTodo(); renderCraftDetail(); }
 
-/* 할 일에 담긴 것들의 재료를 한데 더한다. 레시피가 1회에 여러 개를
-   만들면 필요한 제작 횟수만큼만 재료를 센다. */
+/* 할 일에 담긴 것들의 재료를 한데 더한다. */
 function todoTotals(){
   const sum = new Map();
-  for (const [name, q] of todo){
+  for (const [name, runs] of todo){
     const i = cByName.get(name);
     if (i == null) continue;
     const r = madeBy[i][0];
     if (!r) continue;
-    const runs = Math.ceil(q / (r.q || 1));
     for (const [ii, iq] of r.i) sum.set(ii, (sum.get(ii) || 0) + iq * runs);
   }
   return [...sum].sort((a, b) => b[1] - a[1]
@@ -816,10 +826,12 @@ function renderTodo(){
     minus.onclick = () => todoBump(name, -1);
     const plus = el('button', { ariaLabel:'하나 더하기' }, '+');
     plus.onclick = () => todoBump(name, 1);
-    step.append(minus, el('span', { className:'n' }, String(q)), plus);
+    step.append(minus, el('span', { className:'n', title:'제작 횟수' }, String(q)), plus);
     const del = el('button', { className:'cf-del', ariaLabel:'빼기' }, '✕');
     del.onclick = () => todoDrop(name);
-    row.append(step, del);
+    row.append(step);
+    if (r && r.q > 1) row.append(el('small', {}, `${q * r.q}개`));
+    row.append(del);
     left.append(row);
   }
 
@@ -915,7 +927,9 @@ function renderCraftDetail(){
   hero.append(cIcon(it, 'cf-ic'), txt);
   if (madeBy[cSel].length){
     const n = todo.get(it.n) || 0;
-    const add = el('button', { className:'cf-add' }, n ? `할 일에 ${n}개` : '+ 할 일에 추가');
+    const rq = madeBy[cSel][0].q || 1;
+    const add = el('button', { className:'cf-add' },
+      n ? `할 일에 ${n * rq}개` : '+ 할 일에 추가');
     if (n) add.dataset.in = '1';
     add.onclick = () => todoBump(it.n, 1);
     hero.append(add);

@@ -209,10 +209,16 @@ def main():
             rec["w"] = ws
         recipes.append(rec)
 
+    # 작업대·제작자 이름도 같은 사전으로 한글화한다
+    def ko_of(n):
+        return manual.get(n) or (dg.get(n) or {}).get("kn") or n
+
     out = {
         "source": "The Official Enshrouded Wiki (enshrouded.wiki.gg) Cargo `Ingredients`"
                   " — CC BY-NC-SA 3.0, 한글명·획득 정보 가공",
-        "cats": CATS, "crafters": crafters, "shops": shopnames,
+        "cats": CATS,
+        "crafters": [ko_of(c) for c in crafters],
+        "shops": [ko_of(s) for s in shopnames],
         "biomes": biomes, "types": types,
         "items": items, "recipes": recipes,
     }
@@ -220,7 +226,14 @@ def main():
         f.write(HEADER)
         f.write("window.EMBC=" + json.dumps(out, ensure_ascii=False, separators=(",", ":")) + ";\n")
 
+    # 도감 아이콘을 먼저 쓰고, 빠진 것은 위키에서 받아둔 캐시로 채운다
     icons = {n: dg[n]["i"] for n in names if n in dg and dg[n].get("i")}
+    extra = os.path.join(HERE, "cache-icons.json")
+    if os.path.exists(extra):
+        wiki = json.load(open(extra, encoding="utf-8")).get("icons", {})
+        for n in names:
+            if n not in icons and n in wiki:
+                icons[n] = wiki[n]
     with open(os.path.join(ROOT, "icons.js"), "w", encoding="utf-8") as f:
         f.write("/*! 아이템 아이콘 (webp/base64) — 출처·라이선스는 recipes.js와 같습니다. */\n")
         f.write("window.EMBI=" + json.dumps(icons, ensure_ascii=False, separators=(",", ":")) + ";\n")

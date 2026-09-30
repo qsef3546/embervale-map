@@ -147,7 +147,7 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 
 
 /* 제작 */
-.craft{position:absolute;inset:0;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:320px 1fr}
+.craft{position:absolute;inset:0;overflow:hidden;background:var(--bg);display:grid;grid-template-columns:320px 1fr;grid-template-rows:minmax(0,1fr) auto}
 .cf-list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
 .cf-top{padding:14px 14px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:9px}
 .cf-chips{display:flex;flex-wrap:wrap;gap:5px}
@@ -212,13 +212,50 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
   .cf-detail{padding:18px 16px 40px}
 }
 @media (max-width:760px){
-  .craft{grid-template-columns:1fr;grid-template-rows:auto}
+  .craft{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .cf-todo-body{grid-template-columns:1fr}
+  .cf-todo{max-height:52vh}
   .craft[data-sel="1"] .cf-list{display:none}
   .craft:not([data-sel="1"]) .cf-detail{display:none}
   .cf-list{border-right:0}
   .cf-back{display:inline-flex!important}
   .craft{padding-top:52px}
 }
+
+/* 할 일(제작 목록) */
+.cf-todo{grid-column:1/-1;border-top:1px solid var(--line2);background:var(--panel);max-height:44vh;overflow-y:auto}
+.cf-todo-hd{position:sticky;top:0;z-index:1;background:var(--panel);display:flex;align-items:center;gap:9px;padding:9px 16px;border-bottom:1px solid var(--line)}
+.cf-todo-hd h3{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember)}
+.cf-todo-hd .sp{flex:1}
+.cf-todo-hd em{font-style:normal;color:var(--dim);font-size:11.5px}
+.cf-todo-hd button{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;color:var(--muted)}
+.cf-todo-hd button:hover{color:var(--ink);border-color:var(--muted)}
+.cf-todo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;padding:12px 16px 16px}
+.cf-todo-col h4{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.cf-job{display:flex;align-items:center;gap:8px;padding:4px 5px;border-radius:6px;min-width:0}
+.cf-job:hover{background:var(--panel2)}
+.cf-job img,.cf-job .ph{width:24px;height:24px;flex:none;border-radius:4px;background:#0d0f13;border:1px solid var(--line);object-fit:contain}
+.cf-job .ph{display:grid;place-items:center;color:var(--dim);font-size:10px}
+.cf-job .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;padding:0}
+.cf-job .nm:hover{color:var(--ember)}
+.cf-job small{color:var(--dim);font-size:11px;flex:none}
+.cf-step{display:flex;align-items:center;flex:none}
+.cf-step button{width:24px;height:24px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);cursor:pointer;font-size:14px;line-height:1;display:grid;place-items:center}
+.cf-step button:first-child{border-radius:5px 0 0 5px;border-right:0}
+.cf-step button:last-child{border-radius:0 5px 5px 0;border-left:0}
+.cf-step button:hover{border-color:var(--ember);color:var(--ember)}
+.cf-step .n{min-width:32px;height:24px;display:grid;place-items:center;text-align:center;font-variant-numeric:tabular-nums;font-size:13px;border:1px solid var(--line2);background:var(--bg)}
+.cf-del{background:none;border:0;color:var(--dim);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;flex:none}
+.cf-del:hover{color:#e06060;background:var(--panel)}
+.cf-sum{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start}
+.cf-mat{display:flex;align-items:center;gap:7px;background:var(--panel2);border:1px solid var(--line2);border-radius:999px;padding:3px 12px 3px 4px;font-size:12.5px;cursor:pointer;color:inherit}
+.cf-mat:hover{border-color:var(--ember)}
+.cf-mat img,.cf-mat .ph{width:20px;height:20px;border-radius:50%;background:#0d0f13;object-fit:contain;flex:none}
+.cf-mat .ph{display:grid;place-items:center;color:var(--dim);font-size:9px}
+.cf-mat b{color:var(--ember);font-weight:600;font-variant-numeric:tabular-nums}
+.cf-add{background:var(--ember);border:0;color:#1a1207;border-radius:7px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;margin-left:auto;flex:none}
+.cf-add:hover{filter:brightness(1.08)}
+.cf-add[data-in="1"]{background:var(--panel2);color:var(--muted);border:1px solid var(--line2)}
 .cf-back{display:none;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:6px 11px;cursor:pointer;font-size:12.5px;align-self:flex-start}
 
 body[data-view="craft"] .map-only{display:none}
@@ -301,6 +338,7 @@ body[data-view="craft"] .map-only{display:none}
         <div class="cf-scroll" id="cfScroll"></div>
       </div>
       <div class="cf-detail" id="cfDetail"></div>
+      <div class="cf-todo" id="cfTodo" hidden></div>
     </div>
     <button class="side-toggle" id="sideToggle" aria-controls="side" aria-expanded="false">☰ 메뉴</button>
   </main>
@@ -716,6 +754,105 @@ function renderCraftList(){
   }
 }
 
+
+/* ───────── 할 일(제작 목록) ───────── */
+const todo = new Map(Object.entries(store.get('emb2.todo', {})));
+let todoOpen = store.get('emb2.todoOpen', true);
+function saveTodo(){ store.set('emb2.todo', Object.fromEntries(todo)); }
+function todoBump(name, d){
+  const q = (todo.get(name) || 0) + d;
+  if (q > 0) todo.set(name, q); else todo.delete(name);
+  saveTodo(); renderTodo(); renderCraftDetail();
+}
+function todoDrop(name){ todo.delete(name); saveTodo(); renderTodo(); renderCraftDetail(); }
+
+/* 할 일에 담긴 것들의 재료를 한데 더한다. 레시피가 1회에 여러 개를
+   만들면 필요한 제작 횟수만큼만 재료를 센다. */
+function todoTotals(){
+  const sum = new Map();
+  for (const [name, q] of todo){
+    const i = cByName.get(name);
+    if (i == null) continue;
+    const r = madeBy[i][0];
+    if (!r) continue;
+    const runs = Math.ceil(q / (r.q || 1));
+    for (const [ii, iq] of r.i) sum.set(ii, (sum.get(ii) || 0) + iq * runs);
+  }
+  return [...sum].sort((a, b) => b[1] - a[1]
+    || cName(CI[a[0]]).localeCompare(cName(CI[b[0]]), 'ko'));
+}
+
+function renderTodo(){
+  const box = $('cfTodo');
+  box.textContent = '';
+  box.hidden = !todo.size;
+  if (!todo.size) return;
+
+  const totals = todoTotals();
+  const hd = el('div', { className:'cf-todo-hd' });
+  hd.append(el('h3', {}, `할 일 ${todo.size}종`), el('em', {}, `재료 ${totals.length}종`),
+            el('div', { className:'sp' }));
+  const fold = el('button', {}, todoOpen ? '접기' : '펼치기');
+  fold.onclick = () => { todoOpen = !todoOpen; store.set('emb2.todoOpen', todoOpen); renderTodo(); };
+  const clear = el('button', {}, '비우기');
+  clear.onclick = () => { todo.clear(); saveTodo(); renderTodo(); renderCraftDetail(); };
+  hd.append(fold, clear);
+  box.append(hd);
+  if (!todoOpen) return;
+
+  const body = el('div', { className:'cf-todo-body' });
+  const left = el('div', { className:'cf-todo-col' });
+  left.append(el('h4', {}, '만들 것'));
+  for (const [name, q] of todo){
+    const i = cByName.get(name);
+    if (i == null) continue;
+    const it = CI[i], r = madeBy[i][0], row = el('div', { className:'cf-job' });
+    const nm = el('button', { className:'nm' }, cName(it));
+    nm.onclick = () => selectCraft(i);
+    row.append(cIcon(it, ''), nm);
+    if (r && r.q > 1) row.append(el('small', {}, `1회 ${r.q}개`));
+    const step = el('div', { className:'cf-step' });
+    const minus = el('button', { ariaLabel:'하나 빼기' }, '−');
+    minus.onclick = () => todoBump(name, -1);
+    const plus = el('button', { ariaLabel:'하나 더하기' }, '+');
+    plus.onclick = () => todoBump(name, 1);
+    step.append(minus, el('span', { className:'n' }, String(q)), plus);
+    const del = el('button', { className:'cf-del', ariaLabel:'빼기' }, '✕');
+    del.onclick = () => todoDrop(name);
+    row.append(step, del);
+    left.append(row);
+  }
+
+  const right = el('div', { className:'cf-todo-col' });
+  right.append(el('h4', {}, '필요한 재료 총합'));
+  const sum = el('div', { className:'cf-sum' });
+  for (const [i, q] of totals){
+    const it = CI[i], chip = el('button', { className:'cf-mat', title:cWhere(i) });
+    chip.append(cIcon(it, ''), el('span', {}, cName(it)), el('b', {}, String(q)));
+    chip.onclick = () => selectCraft(i);
+    sum.append(chip);
+  }
+  right.append(sum);
+
+  body.append(left, right);
+  box.append(body);
+}
+
+/* 재료를 어디서 구하나. 만들 수 있으면 작업대, 아니면 지역·채집 방식. */
+function cWhere(i){
+  const it = CI[i], r = madeBy[i][0];
+  if (r) return cShops(r)[0] || '제작';
+  const bits = [];
+  if (it.b?.length) bits.push(it.b.map(b => C.biomes[b]).join(', '));
+  if (it.t?.length) bits.push(it.t.map(t => C.types[t]).join('/'));
+  return bits.join(' · ') || '원자재';
+}
+function cWhereFull(i){
+  const it = CI[i];
+  return [...(it.w || []), ...(it.dr || []),
+          it.m?.length ? '처치: ' + it.m.join(', ') : ''].filter(Boolean).join('\n');
+}
+
 /* 트리 한 줄. dir='down' 은 재료 쪽, dir='up' 은 이걸 쓰는 쪽으로 내려간다. */
 function cTreeNode(idx, qty, dir, path, depth, where){
   const it = CI[idx], li = el('li'), node = el('div', { className:'cf-node' });
@@ -733,7 +870,7 @@ function cTreeNode(idx, qty, dir, path, depth, where){
   node.append(tw, cIcon(it, ''), link);
   if (qty) node.append(el('span', { className:'cf-qty' }, '×' + qty));
   if (where) node.append(el('span', { className:'cf-where' }, where));
-  else if (dir === 'down' && !madeBy[idx].length) node.append(el('span', { className:'cf-raw' }, '원자재'));
+  else if (dir === 'down') node.append(el('span', { className:'cf-where', title:cWhereFull(idx) }, cWhere(idx)));
   li.append(node);
 
   if (open && kids.length){
@@ -776,6 +913,13 @@ function renderCraftDetail(){
   for (const t of it.t || []) tags.append(el('span', { className:'cf-tag' }, C.types[t]));
   txt.append(tags);
   hero.append(cIcon(it, 'cf-ic'), txt);
+  if (madeBy[cSel].length){
+    const n = todo.get(it.n) || 0;
+    const add = el('button', { className:'cf-add' }, n ? `할 일에 ${n}개` : '+ 할 일에 추가');
+    if (n) add.dataset.in = '1';
+    add.onclick = () => todoBump(it.n, 1);
+    hero.append(add);
+  }
   inr.append(hero);
   if (it.d) inr.append(el('p', { className:'cf-desc' }, it.d));
 
@@ -826,7 +970,7 @@ function renderCraftDetail(){
   box.scrollTop = 0;
 }
 
-function renderCraft(){ renderCraftList(); renderCraftDetail(); }
+function renderCraft(){ renderCraftList(); renderCraftDetail(); renderTodo(); }
 
 function selectCraft(i){
   cSel = i;

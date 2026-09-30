@@ -24,7 +24,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--ember);outline-offset:2px}
 a{color:var(--shroud)}
 
-.app{display:grid;grid-template-columns:320px 1fr;height:100%}
 
 /* 사이드바 */
 .side{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column}
@@ -32,9 +31,23 @@ a{color:var(--shroud)}
 .brand{text-align:center;padding-top:4px}
 .brand h1{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:.06em;margin:0;line-height:1.1}
 .brand p{margin:6px 0 0;color:var(--ember);font-size:11px;letter-spacing:.24em;text-transform:uppercase}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line2);border-radius:7px;overflow:hidden}
-.tabs a{text-align:center;padding:8px 2px;text-decoration:none;color:var(--muted);font-size:12.5px}
-.tabs a[aria-current="page"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--ember)}
+
+/* 상단바 · 푸터 */
+.shell{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%}
+.topbar{display:flex;align-items:baseline;gap:18px;padding:9px 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar .brand{display:flex;align-items:baseline;gap:9px;padding:0;text-align:left;flex:none}
+.topbar .brand h1{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:.05em;margin:0;line-height:1}
+.topbar .brand p{margin:0;color:var(--ember);font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+.nav{display:flex;gap:3px;flex:1;min-width:0}
+.nav a{padding:5px 13px;border-radius:6px;text-decoration:none;color:var(--muted);font-size:13px;white-space:nowrap}
+.nav a:hover{background:var(--panel2);color:var(--ink)}
+.nav a[aria-current="page"]{background:var(--panel2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--ember)}
+.foot{padding:11px 18px;border-top:1px solid var(--line);background:var(--panel);font-size:11.5px;line-height:1.65;color:var(--muted);text-align:center}
+.foot p{margin:0 auto;max-width:960px}
+.app{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:0}
+body:not([data-view="map"]) .app{grid-template-columns:minmax(0,1fr)}
+body:not([data-view="map"]) .side,
+body:not([data-view="map"]) .side-toggle{display:none}
 .sec-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
 .sec-title button{background:none;border:0;color:var(--dim);font-size:11px;letter-spacing:.04em;cursor:pointer;padding:2px 4px;text-transform:none}
 .sec-title button:hover{color:var(--ink)}
@@ -219,7 +232,6 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
   .craft:not([data-sel="1"]) .cf-detail{display:none}
   .cf-list{border-right:0}
   .cf-back{display:inline-flex!important}
-  .craft{padding-top:52px}
 }
 
 /* 할 일(제작 목록) */
@@ -258,7 +270,6 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .cf-add[data-in="1"]{background:var(--panel2);color:var(--muted);border:1px solid var(--line2)}
 .cf-back{display:none;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:6px 11px;cursor:pointer;font-size:12.5px;align-self:flex-start}
 
-body[data-view="craft"] .map-only{display:none}
 
 @media (max-width:980px){ .tracker{display:none} }
 @media (max-width:760px){
@@ -267,7 +278,11 @@ body[data-view="craft"] .map-only{display:none}
   .side.open{transform:none}
   .side-toggle{display:block}
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:15}
-  .list{padding:64px 16px 32px}
+  .list{padding:20px 16px 32px}
+  .topbar{padding:8px 14px;gap:12px}
+  .topbar .brand h1{font-size:17px}
+  .topbar .brand p{display:none}
+  .foot{padding:9px 14px;font-size:10.5px;line-height:1.55}
   details.grp summary{grid-template-columns:22px 1fr 56px}
   details.grp summary .bar{display:none}
 }
@@ -275,35 +290,33 @@ body[data-view="craft"] .map-only{display:none}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <h1>인슈라오디드</h1>
+      <p>엠버베일 한글 지도</p>
+    </div>
+    <nav class="nav">
+      <a href="#map" id="tabMap">지도</a>
+      <a href="#checklist" id="tabList">체크리스트</a>
+      <a href="#craft" id="tabCraft">제작</a>
+    </nav>
+  </header>
+
+  <div class="app">
   <aside class="side" id="side" aria-label="메뉴">
     <div class="side-in">
-      <div class="brand">
-        <h1>인슈라오디드</h1>
-        <p>엠버베일 한글 지도</p>
-      </div>
-      <nav class="tabs">
-        <a href="#map" id="tabMap">지도</a>
-        <a href="#checklist" id="tabList">체크리스트</a>
-        <a href="#craft" id="tabCraft">제작</a>
-      </nav>
-      <div class="map-only">
+      <div>
         <div class="search"><input id="q" type="search" placeholder="장소·수집품 검색 (한글/영문)" aria-label="검색" autocomplete="off"></div>
         <ul class="results" id="results" hidden></ul>
       </div>
-      <div class="row map-only">
+      <div class="row">
         <button class="btn" id="showAll">모두 표시</button>
         <button class="btn" id="hideAll">모두 숨김</button>
       </div>
-      <div id="sections" class="map-only"></div>
-      <label class="check map-only"><input type="checkbox" id="hideFound"> 찾은 항목 지도에서 숨기기</label>
-      <label class="check map-only"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
-      <div class="note">
-        비공식 팬 제작 지도이며 Keen Games와 관련이 없습니다.
-        마커 좌표·이름·설명은 <a href="https://enshrouded.wiki.gg/wiki/Map" target="_blank" rel="noopener">The Official Enshrouded Wiki</a> 기여자들의 데이터를 한국어로 옮긴 것으로,
-        <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.ko" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a>을 따릅니다.
-        배경 지형은 마커 분포로 추정해 새로 그린 개략도입니다. 찾음 표시는 이 브라우저에만 저장됩니다.
-      </div>
+      <div id="sections"></div>
+      <label class="check"><input type="checkbox" id="hideFound"> 찾은 항목 지도에서 숨기기</label>
+      <label class="check"><input type="checkbox" id="labelsOn" checked> 지역 이름 표시</label>
     </div>
   </aside>
 
@@ -342,6 +355,16 @@ body[data-view="craft"] .map-only{display:none}
     </div>
     <button class="side-toggle" id="sideToggle" aria-controls="side" aria-expanded="false">☰ 메뉴</button>
   </main>
+  </div>
+
+  <footer class="foot">
+    <p>
+      비공식 팬 제작 지도이며 Keen Games와 관련이 없습니다.
+        마커 좌표·이름·설명은 <a href="https://enshrouded.wiki.gg/wiki/Map" target="_blank" rel="noopener">The Official Enshrouded Wiki</a> 기여자들의 데이터를 한국어로 옮긴 것으로,
+        <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.ko" target="_blank" rel="noopener">CC BY-NC-SA 3.0</a>을 따릅니다.
+        배경 지형은 마커 분포로 추정해 새로 그린 개략도입니다. 찾음 표시는 이 브라우저에만 저장됩니다.
+    </p>
+  </footer>
 </div>
 
 <script src="data.js"></script>

@@ -26,7 +26,7 @@ ROOT = os.path.dirname(HERE)
 CACHE = os.path.join(HERE, "cache-icons.json")
 API = "https://enshrouded.wiki.gg/api.php"
 UA = "embervale-map-databuilder/1.0 (+https://github.com/qsef3546/embervale-map)"
-SIZE = 48
+SIZE = 40
 BATCH = 50
 
 

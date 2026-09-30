@@ -27,6 +27,7 @@
 - 재료마다 오른쪽에 **어디서 구하는지** 표시 — 만들 수 있으면 작업대, 아니면 지역과 채집 방식
 - 분류(장식·건축 / 요리·음료 / 물약·연금 / 장비·무기 / 농사·씨앗 / 기타 / 원자재) 필터, 한글·영문 검색
 - 재료의 획득처(지역·채집 방식·드롭 몬스터)와 아이콘 표시. 1,987종 중 1,955종(98%)에 아이콘이 있습니다
+- **옵션** — 방어구의 물리·마법 저항, 음식·물약의 지속시간과 효과, 무기의 공격 속도·퍽, 도구의 피해·내구도를 보여 줍니다 (옵션 500종 / 효과 390종). 설명은 1,944종에 있습니다
 
 #### 할 일
 
@@ -53,6 +54,7 @@ Enshrouded 및 관련 명칭·콘텐츠의 권리는 Keen Games GmbH에 있습�
 `recipes.js`와 `icons.js`는 생성 파일입니다. 위키가 갱신되었거나 한글 이름을 보탰다면 다시 만듭니다.
 
 ```bash
+python tools/fetch_stats.py                                              # 아이템 설명·옵션을 위키에서 받기
 python tools/fetch_icons.py                                              # 도감에 없는 아이콘을 위키에서 받기
 python tools/build_recipes.py --dogam "Enshrouded_재료도감.html"          # 캐시된 레시피로 재생성
 python tools/build_recipes.py --dogam "Enshrouded_재료도감.html" --refetch # 위키에서 다시 받기

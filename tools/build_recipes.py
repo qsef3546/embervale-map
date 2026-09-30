@@ -20,6 +20,8 @@ import urllib.parse
 import urllib.request
 from collections import OrderedDict, defaultdict
 
+import stats_ko
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 CACHE = os.path.join(HERE, "cache-ingredients.json")
@@ -108,7 +110,13 @@ def group_recipes(rows):
     return grouped
 
 
-def build_items(names, crafted, shops, dg, manual):
+def load_stats():
+    """위키에서 받아 둔 설명·옵션. 없으면 조용히 건너뛴다."""
+    path = os.path.join(HERE, "cache-stats.json")
+    return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+
+
+def build_items(names, crafted, shops, dg, manual, wiki):
     biomes, types = [], []
     items = []
     for n in names:
@@ -149,6 +157,22 @@ def build_items(names, crafted, shops, dg, manual):
             mobs = [p.get("c") for p in e.get("p") or [] if p.get("c")]
             if mobs:
                 it["m"] = mobs
+
+        w = wiki.get(n) or {}
+        if not it.get("d") and w.get("description"):
+            it["d"] = w["description"]
+        if w.get("Type"):
+            it["ty"] = stats_ko.TYPE_KO.get(w["Type"], w["Type"])
+        if not it.get("r") and w.get("Rarity"):
+            it["r"] = w["Rarity"]
+        if not it.get("l") and (w.get("Level") or "").isdigit():
+            it["l"] = int(w["Level"])
+        if w.get("stats"):
+            it["st"] = [list(x) for x in stats_ko.stats_list(w["stats"])]
+        if w.get("effects"):
+            it["ef"] = [list(stats_ko.effect(e)) for e in w["effects"]]
+        if w.get("perks"):
+            it["pk"] = [stats_ko.perk(x) for x in w["perks"]]
         items.append(it)
     return items, biomes, types
 
@@ -196,7 +220,9 @@ def main():
     ci = {c: i for i, c in enumerate(crafters)}
     si = {s: i for i, s in enumerate(shopnames)}
 
-    items, biomes, types = build_items(names, crafted, shops, dg, manual)
+    wiki = load_stats()
+    print("위키 설명·옵션 %d" % sum(1 for v in wiki.values() if v))
+    items, biomes, types = build_items(names, crafted, shops, dg, manual, wiki)
 
     recipes = []
     for (item, crafter, w1, w2), g in grouped.items():
@@ -238,6 +264,9 @@ def main():
         f.write("/*! 아이템 아이콘 (webp/base64) — 출처·라이선스는 recipes.js와 같습니다. */\n")
         f.write("window.EMBI=" + json.dumps(icons, ensure_ascii=False, separators=(",", ":")) + ";\n")
 
+    print("  설명 %d · 옵션 %d · 효과 %d"
+          % (sum(1 for i in items if "d" in i), sum(1 for i in items if "st" in i),
+             sum(1 for i in items if "ef" in i)))
     named = sum(1 for i in items if "k" in i)
     print("\n아이템 %d (한글명 %d, %.0f%%) · 레시피 %d · 아이콘 %d"
           % (len(items), named, 100 * named / len(items), len(recipes), len(icons)))

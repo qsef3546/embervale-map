@@ -234,6 +234,16 @@ details.grp .items{border-top:1px solid var(--line);padding:6px 8px 10px;display
 .cf-block>h3{margin:0 0 9px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .cf-block>h3 em{font-style:normal;color:var(--dim);letter-spacing:0;text-transform:none;font-size:11.5px}
 .cf-none{color:var(--dim);font-size:12.5px;margin:0}
+.cf-stats{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;margin:0;font-size:13px}
+.cf-stats dt{color:var(--muted);white-space:nowrap}
+.cf-stats dd{margin:0;color:var(--ink);font-variant-numeric:tabular-nums}
+.cf-stats dt.ef{color:var(--ok)}
+.cf-stats dd.ef{color:var(--ok)}
+.cf-stats dt.dn{color:#d97070}
+.cf-stats dd.dn{color:#d97070}
+.cf-stats hr{grid-column:1/-1;border:0;border-top:1px solid var(--line);margin:3px 0}
+.cf-perks{display:flex;flex-wrap:wrap;gap:5px}
+.cf-perk{font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--shroud)}
 .cf-src{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#c2c6d0;margin:0;padding:0;list-style:none}
 .cf-src li{display:flex;gap:7px}
 .cf-src b{color:var(--muted);font-weight:500;flex:none;min-width:44px}
@@ -1006,6 +1016,7 @@ function renderCraftDetail(){
   txt.append(el('h2', {}, cName(it)));
   if (it.k) txt.append(el('div', { className:'en' }, it.n));
   const tags = el('div', { className:'cf-tags' });
+  if (it.ty) tags.append(el('span', { className:'cf-tag' }, it.ty));
   tags.append(el('span', { className:'cf-tag' }, C.cats[it.c]));
   if (it.r) tags.append(el('span', { className:'cf-tag r-' + it.r }, it.r));
   if (it.l) tags.append(el('span', { className:'cf-tag' }, 'Lv ' + it.l));
@@ -1023,6 +1034,25 @@ function renderCraftDetail(){
   }
   inr.append(hero);
   if (it.d) inr.append(el('p', { className:'cf-desc' }, it.d));
+
+  /* 옵션 — 스탯, 먹거나 입었을 때의 효과, 퍽 */
+  if (it.st?.length || it.ef?.length || it.pk?.length){
+    const b = cBlock('옵션'), dl = el('dl', { className:'cf-stats' });
+    for (const [k, v] of it.st || []) dl.append(el('dt', {}, k), el('dd', {}, v));
+    if ((it.st || []).length && (it.ef || []).length) dl.append(el('hr'));
+    for (const [k, v] of it.ef || []){
+      const c = v.startsWith('−') ? ' dn' : ' ef';
+      dl.append(el('dt', { className:c.trim() }, k), el('dd', { className:c.trim() }, v));
+    }
+    b.append(dl);
+    if (it.pk?.length){
+      b.append(el('p', { className:'cf-alt' }, '퍽'));
+      const ps = el('div', { className:'cf-perks' });
+      for (const p of it.pk) ps.append(el('span', { className:'cf-perk' }, p));
+      b.append(ps);
+    }
+    inr.append(b);
+  }
 
   /* 어디서 얻나 — 도감이 있는 아이템만 */
   if (it.b?.length || it.w?.length || it.dr?.length || it.m?.length){
@@ -1134,6 +1164,7 @@ const HELP = {
     ['할 일', '위쪽은 담은 것, 아래쪽은 <b>필요한 재료 총합</b>입니다. 칩을 누르면 그 재료로 넘어갑니다. 수량은 <b>제작 횟수</b>라서, 1회에 10개가 나오는 레시피는 ＋ 한 번이 10개씩 늘고 재료도 한 벌씩 늘어납니다.'],
   ], [
     ['알아 두면', [
+      '무기·방어구·음식처럼 옵션이 있는 아이템은 설명 아래에 <b>옵션</b> 칸이 붙습니다. 방어구는 물리·마법 저항, 음식과 물약은 지속시간과 효과, 무기는 공격 속도와 퍽이 나옵니다.',
       '화면이 좁으면(1200px 미만) 할 일이 오른쪽에서 화면 아래 막대로 내려갑니다.',
       '고른 아이템이 주소에 남습니다(<kbd>#craft=Leather</kbd>). 링크로 공유할 수 있습니다.',
       '담아 둔 할 일은 이 브라우저에만 저장됩니다.',

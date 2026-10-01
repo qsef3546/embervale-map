@@ -116,13 +116,19 @@ def load_desc_ko():
     return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 
 
+def load_growth():
+    """묘목이 어느 흙에서 얼마나 빨리 자라는지."""
+    path = os.path.join(HERE, "cache-growth.json")
+    return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+
+
 def load_stats():
     """위키에서 받아 둔 설명·옵션. 없으면 조용히 건너뛴다."""
     path = os.path.join(HERE, "cache-stats.json")
     return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
 
 
-def build_items(names, crafted, shops, dg, manual, wiki, desc_ko):
+def build_items(names, crafted, shops, dg, manual, wiki, desc_ko, growth, ko_of):
     biomes, types = [], []
     items = []
     for n in names:
@@ -177,6 +183,21 @@ def build_items(names, crafted, shops, dg, manual, wiki, desc_ko):
             it["st"] = [list(x) for x in stats_ko.stats_list(w["stats"])]
         if w.get("effects"):
             it["ef"] = [list(stats_ko.effect(e)) for e in w["effects"]]
+        g = growth.get(n) or {}
+        if g.get("soils"):
+            soils = []
+            for soil, pref, t in g["soils"]:
+                mins = stats_ko.minutes(t)
+                soils.append([ko_of(soil), stats_ko.PREF_KO.get(pref, pref or ""),
+                              t if mins else "—", mins or 1e9])
+            # 빠른 순서로. 선호도가 있으면 그것부터 본다
+            soils.sort(key=lambda x: (x[3], x[0]))
+            gw = {"s": [x[:3] for x in soils]}
+            if g.get("need"):
+                gw["g"] = stats_ko.GROUND_KO.get(g["need"], g["need"])
+            if g.get("stages"):
+                gw["st"] = g["stages"]
+            it["gw"] = gw
         if w.get("perks"):
             it["pk"] = [stats_ko.perk(x) for x in w["perks"]]
         items.append(it)
@@ -230,7 +251,14 @@ def main():
     print("위키 설명·옵션 %d" % sum(1 for v in wiki.values() if v))
     desc_ko = load_desc_ko()
     print("설명 한글 사전 %d" % len(desc_ko))
-    items, biomes, types = build_items(names, crafted, shops, dg, manual, wiki, desc_ko)
+    growth = load_growth()
+    print("묘목 재배 정보 %d" % sum(1 for v in growth.values() if v.get("soils")))
+
+    def ko_of_name(x):
+        return manual.get(x) or (dg.get(x) or {}).get("kn") or x
+
+    items, biomes, types = build_items(names, crafted, shops, dg, manual, wiki,
+                                       desc_ko, growth, ko_of_name)
 
     recipes = []
     for (item, crafter, w1, w2), g in grouped.items():
@@ -272,9 +300,10 @@ def main():
         f.write("/*! 아이템 아이콘 (webp/base64) — 출처·라이선스는 recipes.js와 같습니다. */\n")
         f.write("window.EMBI=" + json.dumps(icons, ensure_ascii=False, separators=(",", ":")) + ";\n")
 
-    print("  설명 %d · 옵션 %d · 효과 %d"
+    print("  설명 %d · 옵션 %d · 효과 %d · 재배 %d"
           % (sum(1 for i in items if "d" in i), sum(1 for i in items if "st" in i),
-             sum(1 for i in items if "ef" in i)))
+             sum(1 for i in items if "ef" in i),
+             sum(1 for i in items if "gw" in i)))
     named = sum(1 for i in items if "k" in i)
     print("\n아이템 %d (한글명 %d, %.0f%%) · 레시피 %d · 아이콘 %d"
           % (len(items), named, 100 * named / len(items), len(recipes), len(icons)))

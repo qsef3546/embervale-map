@@ -184,3 +184,15 @@ def stats_list(d):
         if k not in seen:
             out.append(stat(k, v))
     return out
+
+
+# ───────── 묘목 재배 ─────────
+GROUND_KO = {"Dry Ground": "마른 땅", "Wet Ground": "젖은 땅", "Water": "물속"}
+PREF_KO = {"Preferred": "선호", "Neutral": "보통", "Reduced": "느림", "N/A": "못 자람"}
+PREF_RANK = {"Preferred": 0, "Neutral": 1, "Reduced": 2, "N/A": 3}
+
+
+def minutes(t):
+    """'22:00' → 22.0, 'N/A' → None"""
+    m = re.match(r"^(\d+):(\d+)$", (t or "").strip())
+    return int(m.group(1)) + int(m.group(2)) / 60 if m else None

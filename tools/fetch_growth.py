@@ -46,7 +46,8 @@ def clean(s):
 
 
 def parse_growth(text):
-    m = re.search(r"==\s*Growth\s*==(.*?)(\n==[^=]|\Z)", text, re.S)
+    # 문서마다 제목이 "Growth" 또는 "Growth Time" 으로 갈린다
+    m = re.search(r"==\s*Growth(?:\s+Time)?\s*==(.*?)(\n==[^=]|\Z)", text, re.S)
     if not m:
         return None
     body = m.group(1)

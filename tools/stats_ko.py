@@ -46,7 +46,8 @@ TYPE_KO = {
     "Spell": "주문", "Spells": "주문", "Staff": "지팡이",
     "Terrain Materials": "지형 자재", "Throwable": "투척물", "Tools": "도구",
     "Upper Body Armor": "상체 방어구", "Upper Body Cosmetic": "상체 치장",
-    "Wand": "마법봉", "Weapon": "무기",
+    "Wand": "마법봉", "Weapon": "무기", "Dye": "염료", "Tool": "도구",
+    "Two-Handed Greatsword": "양손 대검",
     "Two-handed Axe": "양손 도끼", "Two-handed Sword": "양손 검",
     "Two-handed Club": "양손 곤봉", "Two-Handed Hammer": "양손 망치",
 }

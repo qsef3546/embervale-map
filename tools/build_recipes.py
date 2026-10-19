@@ -173,7 +173,7 @@ def build_items(names, crafted, shops, dg, manual, wiki, desc_ko, growth, ko_of)
         w = wiki.get(n) or {}
         if not it.get("d") and w.get("description"):
             it["d"] = desc_ko.get(w["description"], w["description"])
-        if w.get("Type"):
+        if w.get("Type") and w["Type"] != "x":  # 위키 자리표시자 "x" 는 버린다
             it["ty"] = stats_ko.TYPE_KO.get(w["Type"], w["Type"])
         if not it.get("r") and w.get("Rarity"):
             it["r"] = w["Rarity"]

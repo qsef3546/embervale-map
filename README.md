@@ -51,6 +51,18 @@
 
 Enshrouded 및 관련 명칭·콘텐츠의 권리는 Keen Games GmbH에 있습니다. 이 프로젝트는 Keen Games와 관련이 없으며 비상업적 용도로만 운영합니다.
 
+## 지도 데이터 다시 만들기
+
+`data.js`도 생성 파일입니다. 위키 지도(`Map:Embervale/*`)가 바뀌었는지는 먼저 `--check` 로 봅니다. 이 명령은 아무 파일도 쓰지 않습니다.
+
+```bash
+python tools/build_map.py --check     # 같으면 exit 0, 달라졌으면 exit 10 과 함께 추가·삭제·이동 목록
+python tools/build_map.py --refetch   # 위키에서 다시 받아 data.js 재생성
+```
+
+- 이름·설명 번역은 `tools/map.ko.json`(영문 → 한글)에 있습니다. 새 마커의 문장이 사전에 없으면 영문으로 들어가고, 목록이 `tools/map.untranslated.json` 에 남습니다. 값을 채워 `map.ko.json` 으로 옮긴 뒤 다시 실행합니다.
+- 지역은 마커 설명의 지역 이름으로 정하고, 이름이 없는 마커는 가까운 마커를 따릅니다. 1.0 신규 지역 **재의 요람(Cinder's Cradle)** 도 규칙에 들어 있어서, 위키에 좌표가 올라오면 다시 생성하는 것만으로 지형과 지역 이름이 생깁니다. 처음 보는 마커 종류는 '기타'로 들어가니 `GROUPS` 에 자리를 잡아 주세요.
+
 ## 제작 데이터 다시 만들기
 
 `recipes.js`와 `icons.js`는 생성 파일입니다. 위키가 갱신되었거나 한글 이름을 보탰다면 다시 만듭니다.

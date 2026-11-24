@@ -42,6 +42,7 @@ GROUP_PAGES = ["Map:Embervale/Groups", "Map:Embervale/Lore-Groups"]
 
 # ── 분류 ─────────────────────────────────────────────────────────────
 S1, S2, S3, S4, S5 = "주요 장소", "거점·자원", "수집품", "기록", "기타"
+S6 = "고정 획득 아이템"   # 늘 같은 자리에서 나오는 무기·장비 등
 # 위키 그룹 id: (한글명, 섹션, 글리프, 색, 기본 표시, 진행 추적, 작은 아이콘)
 GROUPS = {
     "Ancient_Spire":  ("고대 첨탑", S1, "spire", "#7cc4e4", 1, 1, 0),
@@ -86,6 +87,22 @@ GROUPS = {
     "LoreVeilwaterBasin": ("베일워터 분지", S4, "book", "#70c0b8", 0, 1, 1),
     "LoreDrak":       ("드락", S4, "book", "#a0b8a0", 0, 1, 1),
     "QuestLocation":  ("퀘스트 위치", S5, "quest", "#ffd257", 1, 0, 0),
+    # 1.0 갱신(2026-11)으로 위키에 생긴 그룹
+    "Cinder_Fast_Travel": ("재의 요람 빠른 이동", S1, "spire", "#ff7b52", 1, 0, 0),
+    "Named_Area":     ("지명", S2, "house", "#d8c890", 0, 0, 0),
+    "FlameMosaic":    ("화염 모자이크 조각", S3, "flame", "#f08a50", 0, 1, 1),
+    "Meteorite":      ("운석", S3, "rock", "#b0a090", 0, 1, 1),
+    "Miniature_Model": ("엠버베일 축소 모형 조각", S3, "statue", "#c8b898", 0, 1, 1),
+    "Orrery":         ("천체 모형 고리", S3, "ring", "#e0c060", 0, 1, 1),
+    "Painting":       ("그림", S3, "frame", "#d0a070", 0, 1, 1),
+    "Hollow_Artifact": ("망자의 유물", S3, "gem", "#a070d8", 0, 1, 1),
+    "Physical_Inscription": ("새겨진 글", S4, "relief", "#c8c0a8", 0, 1, 1),
+    "Lore_Acquisition": ("기록을 얻는 곳", S4, "book", "#d8b878", 0, 1, 1),
+    "Fixed_Weapons":  ("무기", S6, "sword", "#e08070", 0, 1, 1),
+    "Fixed_Equipment": ("장비", S6, "helm", "#80b0d8", 0, 1, 1),
+    "Fixed_Instruments": ("악기", S6, "note", "#f2a0c0", 0, 1, 1),
+    "Fixed_Building": ("건축 재료·해금", S6, "brick", "#c0a888", 0, 1, 1),
+    "Fixed_Other":    ("기타 아이템", S6, "chest", "#d8c070", 0, 1, 1),
 }
 # 처음 보는 위키 그룹은 이 모양으로 넣고 경고한다
 UNKNOWN_GROUP = (None, S5, "quest", "#9aa0ad", 1, 0, 0)
@@ -211,7 +228,23 @@ def collect(pages):
         for g, lst in (pages[t].get("markers") or {}).items():
             for m in lst:
                 markers.append({"g": g, **m})
-    return markers, wiki_groups
+    return drop_strays(markers), wiki_groups
+
+
+STRAY = 1500   # 다른 마커와 이만큼 떨어진 좌표 묶음은 위키의 임시 좌표로 보고 뺀다
+
+
+def drop_strays(markers):
+    """같은 자리에 겹친 묶음까지 한 덩어리로 보고, 다른 마커가 STRAY 안에 하나도 없으면 뺀다.
+    (2026-11 위키에 '여름 축제' 장비 5개가 (312, 9557.5) 한 점에 찍혀 지도 범위가 크게 늘었다)"""
+    out, gone = [], []
+    for m in markers:
+        near = any(o is not m and (o["x"], o["y"]) != (m["x"], m["y"])
+                   and abs(o["x"] - m["x"]) < STRAY and abs(o["y"] - m["y"]) < STRAY for o in markers)
+        (out if near else gone).append(m)
+    if gone:
+        print("외딴 좌표라 뺀 마커 %d개: %s" % (len(gone), ", ".join("%s(%s,%s)" % (m.get("name") or m["id"], m["x"], m["y"]) for m in gone)))
+    return out
 
 
 # ── data.js 와 비교 ──────────────────────────────────────────────────

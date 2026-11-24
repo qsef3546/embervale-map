@@ -23,7 +23,7 @@ STAT_ORDER = ["weaponType", "level", "Physical", "Magical", "Cutting", "Damage",
 
 ELEMENT_KO = {"Blunt": "타격", "Cutting": "절삭", "Piercing": "관통", "Fire": "화염",
               "Ice": "냉기", "Heal": "치유", "Poison": "독", "Shock": "전격",
-              "Shroud": "어둠의 안개"}
+              "Shroud": "어둠의 안개", "Healing": "치유"}
 
 TYPE_KO = {
     "Arm Armor": "팔 방어구", "Arm Cosmetic": "팔 치장", "Arrow": "화살", "Bow": "활",
@@ -50,6 +50,7 @@ TYPE_KO = {
     "Two-Handed Greatsword": "양손 대검",
     "Two-handed Axe": "양손 도끼", "Two-handed Sword": "양손 검",
     "Two-handed Club": "양손 곤봉", "Two-Handed Hammer": "양손 망치",
+    "One-handed": "한손", "Two-handed Greatsword": "양손 대검", "Two-handed Hammer": "양손 망치",
 }
 
 EFFECT_KO = {
@@ -108,7 +109,40 @@ EFFECT_KO = {
     "Damage against Ranged enemies": "원거리형 적 상대 피해",
     "Damage against Wildlife and Wildbeasts": "야생동물 상대 피해",
     "Damage against shroud": "어둠의 안개 상대 피해",
+    "Backstab Damage": "기습 피해", "Greatsword Damage": "대검 피해", "Healing": "치유",
+    "Magic Fire Damage while Enshrouded": "안개 속 마법 화염 피해",
+    "Physical Resistance within the barrier": "방벽 안 물리 저항",
+    "Does not deal damage": "피해 없음",
+    "Pushes back enemies around the caster": "시전자 주변의 적을 밀쳐 냄",
 }
+
+# 1.0 주문 페이지는 효과를 'Radius: 4m' 처럼 '이름: 값' 으로 적는다
+COLON_KO = {
+    "Duration": "지속시간", "Debuff Duration": "약화 지속시간", "Radius": "반경",
+    "Effect radius": "효과 반경", "Damage radius": "피해 반경", "Slow": "둔화",
+    "Shield Health": "보호막 체력", "Throw Interval": "투척 간격",
+    "Time in the Shroud": "어둠의 안개 체류 시간", "Mana recovery": "마나 회복",
+    "Stamina Damage": "기력 피해",
+    "Stamina Damage (Shroud-infested enemies)": "기력 피해 (어둠의 안개에 잠식된 적)",
+}
+COLON_RE = re.compile(r"^([A-Za-z][A-Za-z ()\-]*?):\s*(.+)$")
+
+
+def colon_value(v):
+    v = re.sub(r"(\d)s\b", r"\1초", v)
+    v = re.sub(r"(\d)\s*min\b", r"\1분", v)
+    v = re.sub(r";\s*(?:terrain/)?UI radius:\s*([\d.]+m)", r" (표시 \1)", v)
+    v = v.replace("Intelligence", "지능").replace("floor(", "내림(")
+    return v.replace(" per successful pulse", " (파동 적중마다)")
+
+
+def split_effects(effects):
+    """'+ 2 Frost Resistance+ 90s Wet Duration Reduction' 처럼 두 효과가 붙어 온 것을 나눈다."""
+    out = []
+    for e in effects:
+        parts = re.split(r"(?<=[A-Za-z])\+ (?=\d)", e)
+        out += [parts[0]] + ["+ " + p for p in parts[1:]]
+    return out
 
 # 숫자·기호·단위를 앞에서 떼어 낸다. 남는 말이 효과 이름이다.
 NUM = re.compile(r"^\s*([+\-−]?)\s*([\d.]+(?::\d+)?)\s*(%|s\b|min\.?|m\b)?\s*(.*)$")
@@ -117,6 +151,9 @@ UNIT_KO = {"%": "%", "s": "초", "min": "분", "min.": "분", "m": "분"}
 
 def effect(text):
     """'+ 12 Health Regeneration' → ('체력 재생', '+12')"""
+    c = COLON_RE.match(text.strip())
+    if c and c.group(1) in COLON_KO:
+        return COLON_KO[c.group(1)], colon_value(c.group(2))
     m = NUM.match(text)
     if not m:
         return EFFECT_KO.get(text.strip(), text.strip()), ""

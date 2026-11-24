@@ -182,7 +182,7 @@ def build_items(names, crafted, shops, dg, manual, wiki, desc_ko, growth, ko_of)
         if w.get("stats"):
             it["st"] = [list(x) for x in stats_ko.stats_list(w["stats"])]
         if w.get("effects"):
-            it["ef"] = [list(stats_ko.effect(e)) for e in w["effects"]]
+            it["ef"] = [list(stats_ko.effect(e)) for e in stats_ko.split_effects(w["effects"])]
         g = growth.get(n) or {}
         if g.get("soils"):
             soils = []
